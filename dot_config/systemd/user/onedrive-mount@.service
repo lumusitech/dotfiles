@@ -1,0 +1,28 @@
+[Unit]
+Description=Rclone Mount for OneDrive %i
+After=network-online.target
+Wants=network-online.target
+
+[Service]
+Type=notify
+ExecStartPre=-/usr/bin/fusermount3 -uz %h/OneDrive/%i
+ExecStart=/usr/bin/rclone mount onedrive-%i: %h/OneDrive/%i \
+  --config=%h/.config/rclone/rclone.conf \
+  --vfs-cache-mode full \
+  --vfs-cache-max-age 48h \
+  --vfs-cache-max-size 20G \
+  --dir-cache-time 168h \
+  --poll-interval 1m \
+  --attr-timeout 10m \
+  --vfs-read-ahead 64M \
+  --buffer-size 32M \
+  --vfs-fast-fingerprint \
+  --transfers 8 \
+  --checkers 16 \
+  --no-modtime
+ExecStop=/usr/bin/fusermount3 -uz %h/OneDrive/%i
+Restart=on-failure
+RestartSec=10
+
+[Install]
+WantedBy=default.target

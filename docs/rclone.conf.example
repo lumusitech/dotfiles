@@ -25,3 +25,15 @@ type = drive
 scope = drive
 token = {"access_token":"REPLACE_ME","token_type":"Bearer","refresh_token":"REPLACE_ME","expiry":"2026-01-01T00:00:00Z"}
 team_drive = 
+
+[onedrive-lumusitec]
+type = onedrive
+token = {"access_token":"REPLACE_ME","token_type":"Bearer","refresh_token":"REPLACE_ME","expiry":"2026-01-01T00:00:00Z"}
+drive_id = REPLACE_ME_DRIVE_ID
+drive_type = personal
+
+[onedrive-carludev]
+type = onedrive
+token = {"access_token":"REPLACE_ME","token_type":"Bearer","refresh_token":"REPLACE_ME","expiry":"2026-01-01T00:00:00Z"}
+drive_id = REPLACE_ME_DRIVE_ID
+drive_type = personal
