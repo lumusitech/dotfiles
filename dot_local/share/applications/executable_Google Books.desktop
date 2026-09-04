@@ -1,0 +1,9 @@
+[Desktop Entry]
+Version=1.0
+Name=Google Books
+Comment=Google Books
+Exec=omarchy-launch-webapp "https://www.google.com/books/library?hl=es-419&authuser=0"
+Terminal=false
+Type=Application
+Icon=google-books
+StartupNotify=true

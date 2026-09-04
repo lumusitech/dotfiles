@@ -1,0 +1,12 @@
+[Desktop Entry]
+Version=1.0
+Name=Google Sheets
+Comment=Abrir planillas en Google Sheets WebApp
+Exec=/home/carludev/.local/bin/open-google-sheet %u
+Terminal=false
+Type=Application
+Icon=x-office-spreadsheet
+Categories=Office;Spreadsheet;
+MimeType=text/html;application/x-extension-html;
+StartupWMClass=docs.google.com__spreadsheets
+NoDisplay=false

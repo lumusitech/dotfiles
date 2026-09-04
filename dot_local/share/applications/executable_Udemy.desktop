@@ -1,0 +1,9 @@
+[Desktop Entry]
+Version=1.0
+Name=Udemy
+Comment=Udemy
+Exec=omarchy-launch-webapp "https://www.udemy.com/home/my-courses/learning/"
+Terminal=false
+Type=Application
+Icon=udemy
+StartupNotify=true
