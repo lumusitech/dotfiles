@@ -15,15 +15,12 @@ Omarchy y Hyprland integran un sistema Push-to-Talk de dictado por voz ultrarrá
 * **Atajo `F10` (Traducción en Tiempo Real ES $\rightarrow$ EN):**
   * Invoca `voxtype record start --profile translate`.
   * Graba tu voz en español, transcribe con Whisper y procesa la salida mediante el comando `trans -b -s es -t en` ([`translate-shell`](https://github.com/soimort/translate-shell)), escribiendo el resultado traducido al inglés.
-* **Aislamiento de GPU (VRAM):**
-  * Configurado en `config.toml` con `on_demand_loading = true` y `gpu_isolation = true`. El modelo se carga en la VRAM de la GPU **únicamente** mientras se mantenga presionada la tecla `F9` o `F10`, liberando la memoria al soltar.
+* **Aislamiento dinámico de GPU (VRAM):**
+  * Configurado en `config.toml` con `on_demand_loading = true` y `gpu_isolation = true`. El modelo se carga en la memoria de la tarjeta gráfica **únicamente** mientras se mantenga presionada la tecla `F9` o `F10`, liberando la memoria al soltar.
 
 > [!NOTE]
-> **¿Dónde están los modelos y cómo se descargan?**
-> Los archivos binarios de Whisper (`ggml-small.bin`, ~466 MB) no se suben a Git por su peso. En su lugar, el repositorio incluye un hook automático (`run_once_after_04_voxtype_model.sh`) que descarga y activa el modelo automáticamente al aplicar Chezmoi:
-> ```bash
-> voxtype setup --download --model small --activate
-> ```
+> **Descarga automática de modelos:**
+> Los archivos binarios de Whisper (`ggml-small.bin`, ~466 MB) no se suben a Git por su peso. El hook automático `run_once_after_04_voxtype_model.sh` lo descarga y activa automáticamente al aplicar Chezmoi por primera vez.
 
 ---
 
@@ -96,24 +93,109 @@ mise use -g chezmoi || sudo pacman -S chezmoi
 chezmoi init --apply https://github.com/lumusitech/dotfiles.git
 ```
 *Los hooks automáticos de Chezmoi se encargarán de:*
-* Sincronizar todos los runtimes (`Node`, `Java`, `Python`, etc.) con `mise install`.
-* Descargar el modelo Whisper `small` para Voxtype de forma desatendida.
-* Habilitar y levantar los servicios en `systemd --user` (`rclone-mount@` y `voxtype.service`).
+* Sincronizar runtimes (`Node`, `Java`, `Python`, etc.) con `mise install`.
+* Descargar el modelo Whisper `small` de Voxtype de forma desatendida.
+* Habilitar y arrancar servicios de usuario (`rclone-mount@` y `voxtype.service`).
 * Aplicar optimizaciones de visualización en Nautilus.
 * Desplegar todos los atajos de teclado, scripts de `~/.local/bin/`, webapps e iconos.
 
 ### Paso 5: Credenciales Cloud
-Copiar tu archivo `rclone.conf` con las credenciales de Google Drive hacia `~/.config/rclone/rclone.conf` (puedes consultar la plantilla en `docs/rclone.conf.example`).
+Copiar tu archivo `rclone.conf` con las credenciales de Google Drive hacia `~/.config/rclone/rclone.conf` (plantilla de referencia en `docs/rclone.conf.example`).
 
 ---
 
-## 🛠️ Flujo Diario de Mantenimiento
+## 🛡️ Guía Paso a Paso: Cómo Modificar y Guardar tus Dotfiles
 
-| Tarea | Comando / Alias |
+La rama principal **`main` está protegida en GitHub**. Nadie puede hacer push directo para evitar romper configuraciones en producción.
+
+Cualquier cambio se realiza a través de **Ramas Auxiliares + Pull Requests + Squash and Merge**:
+
+```mermaid
+sequenceDiagram
+    autonumber
+    actor Dev as Tú (En tu Terminal)
+    participant CZ as Chezmoi Local
+    participant GH as GitHub Web
+
+    Dev->>CZ: 1. czbranch feat/mi-mejora
+    Note over Dev,CZ: 2. Editas y pruebas tus archivos en caliente
+    Dev->>CZ: 3. czpush (absorbe, commitea y sube rama)
+    Dev->>GH: 4. czpr (abre el navegador para crear el PR)
+    Note over GH: 5. Haces clic en "Squash and merge"
+    Dev->>CZ: 6. czmain (vuelve a main, descarga y aplica)
+```
+
+### El Paso a Paso Detallado:
+
+#### Paso 1: Crear una rama de trabajo auxiliar
+Antes de empezar a hacer modificaciones, crea una rama temporal desde tu terminal:
+```bash
+czbranch feat/nombre-del-cambio
+```
+*(Ejemplo: `czbranch feat/nuevo-atajo-calculadora` o `czbranch fix/ajuste-fuentes`)*.
+
+#### Paso 2: Editar y probar normalmente en tu sistema
+Edita tus archivos donde siempre lo haces:
+* Si es un atajo de Hyprland $\rightarrow$ editas `~/.config/hypr/bindings.lua`.
+* Si es un script $\rightarrow$ editas `~/.local/bin/mi-script`.
+* Si es un alias $\rightarrow$ editas `~/.bash_aliases`.
+* Pruebas que funcione y que no tenga errores.
+
+*(Opcional: puedes correr `czdiff` en cualquier momento para ver exactamente qué líneas cambiaste).*
+
+#### Paso 3: Guardar y subir a GitHub con `czpush`
+Cuando estés conforme con tu cambio, ejecuta:
+```bash
+czpush
+```
+*Este comando automáticamente:*
+1. Verifica que no estés en `main` (para protegerte de rechazos).
+2. Absorbe tus cambios de `$HOME` con `chezmoi re-add`.
+3. Prepara los archivos (`git add .`).
+4. Abre tu editor para que escribas un mensaje de commit descriptivo.
+5. Sube la rama auxiliar a GitHub (`git push -u origin <rama>`).
+
+#### Paso 4: Crear el Pull Request con `czpr`
+Ejecuta:
+```bash
+czpr
+```
+Se abrirá automáticamente la página de GitHub con el formulario de Pull Request listo. Solo revisas el título y haces clic en **"Create pull request"**.
+
+#### Paso 5: En GitHub Web: "Squash and merge"
+1. En la página del Pull Request en GitHub, ve al botón verde al final de la página.
+2. Asegúrate de que diga **"Squash and merge"** (comprime todos tus commits en uno solo limpio).
+3. Haz clic en **Confirm squash and merge**.
+*(GitHub eliminará automáticamente la rama auxiliar para mantener el repo limpio).*
+
+#### Paso 6: Volver a sincronizar tu máquina con `czmain`
+Vuelve a tu terminal y ejecuta:
+```bash
+czmain
+```
+*Este comando:*
+1. Te regresa a la rama `main` local.
+2. Descarga el commit limpio recién mergeado (`git pull`).
+3. Aplica los cambios en tu sistema (`chezmoi apply`).
+
+---
+
+## 🧰 Cheat Sheet de Comandos Rápidos
+
+| Comando | Para qué sirve |
 | :--- | :--- |
-| **Ver cambios modificados en el sistema** | `czst` (`chezmoi status`) |
-| **Revisar diferencias antes de sincronizar** | `czdiff` (`chezmoi diff`) |
-| **Absorber cambios de tu $HOME hacia el repo** | `czre` (`chezmoi re-add`) |
-| **Entrar al directorio del repo con la terminal** | `czcd` (`chezmoi cd`) |
-| **Sincronizar cambios a GitHub en 1 paso** | `czsync` |
-| **En otra PC: descargar cambios y aplicarlos** | `czup` (`chezmoi update`) |
+| **`czst`** | Ver qué archivos has modificado en tu `$HOME` y aún no guardaste en Chezmoi (`chezmoi status`). |
+| **`czdiff`** | Ver las diferencias línea por línea de lo que cambiaste (`chezmoi diff`). |
+| **`czbranch <nombre>`** | Crear y cambiar a una rama de trabajo auxiliar en Chezmoi. |
+| **`czpush`** | Absorber cambios, commitear y subir la rama a GitHub. |
+| **`czpr`** | Abrir la web de GitHub para crear el Pull Request. |
+| **`czmain`** | Cambiar a `main`, descargar lo mergeado y aplicar a tu sistema. |
+| **`czcd`** | Abrir una sub-terminal directamente dentro del repositorio Chezmoi. |
+| **`czup`** | En otra computadora: descargar lo último de GitHub y aplicarlo de inmediato. |
+
+> [!TIP]
+> **¿No te reconoce algún comando o alias?**
+> Recuerda recargar tu sesión con:
+> ```bash
+> source ~/.bash_aliases
+> ```
