@@ -4,9 +4,30 @@ Repositorio integral de configuración, dotfiles y utilitarios para **Omarchy 4*
 
 ---
 
-## 🧭 ¿Qué incluye Omarchy 4 de serie vs. Qué debes instalar?
+## 🎙️ Stack de Voz e IA: Voxtype (Dictado ES & Traducción EN)
 
-Omarchy 4 ya viene con un stack muy completo preinstalado en su ISO base (`/usr/share/omarchy/`). Para evitar instalaciones redundantes, esta es la separación exacta:
+Omarchy y Hyprland integran un sistema Push-to-Talk de dictado por voz ultrarrápido con modelos Whisper locales:
+
+* **Atajo `F9` (Dictado en Español):**
+  * Invoca `voxtype record start` (al presionar) y `voxtype record stop` (al soltar).
+  * Transcribe en español (`language = "es"`) utilizando el modelo local `small`.
+  * Escribe el texto simulando pulsaciones de teclado directamente donde esté el cursor.
+* **Atajo `F10` (Traducción en Tiempo Real ES $\rightarrow$ EN):**
+  * Invoca `voxtype record start --profile translate`.
+  * Graba tu voz en español, transcribe con Whisper y procesa la salida mediante el comando `trans -b -s es -t en` ([`translate-shell`](https://github.com/soimort/translate-shell)), escribiendo el resultado traducido al inglés.
+* **Aislamiento de GPU (VRAM):**
+  * Configurado en `config.toml` con `on_demand_loading = true` y `gpu_isolation = true`. El modelo se carga en la VRAM de la GPU **únicamente** mientras se mantenga presionada la tecla `F9` o `F10`, liberando la memoria al soltar.
+
+> [!NOTE]
+> **¿Dónde están los modelos y cómo se descargan?**
+> Los archivos binarios de Whisper (`ggml-small.bin`, ~466 MB) no se suben a Git por su peso. En su lugar, el repositorio incluye un hook automático (`run_once_after_04_voxtype_model.sh`) que descarga y activa el modelo automáticamente al aplicar Chezmoi:
+> ```bash
+> voxtype setup --download --model small --activate
+> ```
+
+---
+
+## 🧭 ¿Qué incluye Omarchy 4 de serie vs. Qué debes instalar?
 
 ### ✅ Ya incluido de fábrica en Omarchy 4 (NO necesitas instalarlo):
 * **Herramientas de sistema y atajos:** `omacalc` (calculadora oficial), `cliamp` (reproductor de música en terminal), `btop`, `fd`, `ripgrep`, `bat`, `docker`, `docker-compose`, `python-gobject`, `mpv`, `imv`, `lazygit`, `fastfetch`, `mise-bin`.
@@ -16,16 +37,16 @@ Omarchy 4 ya viene con un stack muy completo preinstalado en su ISO base (`/usr/
 
 ### 📥 El Delta que SÍ debes instalar (Lo que no viene en la ISO):
 
-Todos los comandos utilizan el flag `--needed`, por lo que son **100% idempotentes** (si un paquete ya existe, pacman/yay lo omite automáticamente sin reinstalarlo ni reejecutar hooks):
+Todos los comandos son **100% idempotentes** gracias a la bandera `--needed`:
 
 #### 1. Almacenamiento, FUSE y Discos NTFS
 ```bash
 sudo pacman -S --needed rclone fuse3 ntfs-3g
 ```
 
-#### 2. Atajos Especiales & Dictado
-* `voxtype-bin` es requerido para los atajos `F9` (dictado en español) y `F10` (traducción en tiempo real a inglés) definidos en `bindings.lua`:
+#### 2. Dictado por Voz, Traducción Shell & AUR
 ```bash
+sudo pacman -S --needed translate-shell
 yay -S --needed voxtype-bin
 ```
 
@@ -34,21 +55,6 @@ yay -S --needed voxtype-bin
 yay -S --needed onlyoffice-bin ttf-ms-fonts ttf-vista-fonts ttf-aptos-fonts
 fc-cache -fv
 ```
-
----
-
-## 🌐 Webapps Personalizadas Integradas
-
-Las webapps predeterminadas de Omarchy vienen en `/usr/share/omarchy/applications/`. En este repositorio de Chezmoi se respaldan **exclusivamente tus lanzadores y extensiones personalizadas** junto con sus iconos en `~/.local/share/icons/hicolor/256x256/apps/`:
-
-* **Google Workspace Personal & Corporativo:**
-  * Google Gemini (`SUPER + SHIFT + A`), Gemini NotebookLM
-  * Google Gmail, Google Calendar, Google Keep, Google Tasks, Google Contacts
-  * Google Drive (Personal) y Google Drive ABC
-  * Google Meet, Google Translate, Google Sheets (con handler `open-google-sheet`), Google Vids, Google Books
-* **Streaming & Educación:**
-  * YouTube Music (`SUPER + M`)
-  * DevTalles, Udemy, GitHub, Microsoft OneDrive
 
 ---
 
@@ -76,7 +82,7 @@ sudo mount -a
 
 ### Paso 3: Instalar únicamente el Delta
 ```bash
-sudo pacman -S --needed rclone fuse3 ntfs-3g
+sudo pacman -S --needed rclone fuse3 ntfs-3g translate-shell
 yay -S --needed voxtype-bin onlyoffice-bin ttf-ms-fonts ttf-vista-fonts ttf-aptos-fonts
 fc-cache -fv
 ```
@@ -86,13 +92,14 @@ fc-cache -fv
 # 1. Instalar chezmoi (vía mise o pacman)
 mise use -g chezmoi || sudo pacman -S chezmoi
 
-# 2. Inicializar y aplicar todo tu entorno:
+# 2. Inicializar y aplicar todo tu entorno en 1 paso:
 chezmoi init --apply https://github.com/lumusitech/dotfiles.git
 ```
 *Los hooks automáticos de Chezmoi se encargarán de:*
 * Sincronizar todos los runtimes (`Node`, `Java`, `Python`, etc.) con `mise install`.
-* Habilitar y levantar los 4 servicios de `rclone-mount@` en `systemd --user`.
-* Aplicar optimizaciones de visualización rápida en Nautilus.
+* Descargar el modelo Whisper `small` para Voxtype de forma desatendida.
+* Habilitar y levantar los servicios en `systemd --user` (`rclone-mount@` y `voxtype.service`).
+* Aplicar optimizaciones de visualización en Nautilus.
 * Desplegar todos los atajos de teclado, scripts de `~/.local/bin/`, webapps e iconos.
 
 ### Paso 5: Credenciales Cloud

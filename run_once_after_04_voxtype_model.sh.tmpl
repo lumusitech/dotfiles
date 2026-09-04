@@ -1,0 +1,11 @@
+#!/usr/bin/env bash
+# Descarga automática del modelo Whisper 'small' para Voxtype si no existe
+# hash: {{ include "dot_config/voxtype/config.toml" | sha256sum }}
+
+if command -v voxtype >/dev/null 2>&1; then
+  MODEL_PATH="$HOME/.local/share/voxtype/models/ggml-small.bin"
+  if [ ! -f "$MODEL_PATH" ]; then
+    echo "==> Descargando modelo Whisper 'small' para Voxtype..."
+    voxtype setup --download --model small --activate || true
+  fi
+fi
