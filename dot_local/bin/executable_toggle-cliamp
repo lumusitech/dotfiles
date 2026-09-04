@@ -1,0 +1,9 @@
+#!/usr/bin/env bash
+if hyprctl clients | grep -B 15 "class: cliamp-scratchpad" | grep -q "workspace:.*special:cliamp"; then
+    hyprctl dispatch 'hl.dsp.workspace.toggle_special("cliamp")'
+else
+    if ! hyprctl monitors | grep -q "special:cliamp"; then
+        hyprctl dispatch 'hl.dsp.workspace.toggle_special("cliamp")'
+    fi
+    hyprctl dispatch "hl.dsp.exec_cmd(\"foot --app-id=cliamp-scratchpad --title=Cliamp -e cliamp\")"
+fi

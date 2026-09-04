@@ -1,0 +1,12 @@
+[tools]
+bun = "latest"
+chezmoi = "latest"
+codex = "latest"
+deno = "latest"
+gh = "latest"
+go = "latest"
+java = "temurin-25"
+node = "26.7.0"
+opencode = "latest"
+pnpm = "latest"
+python = "latest"

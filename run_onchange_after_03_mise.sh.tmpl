@@ -1,0 +1,7 @@
+#!/usr/bin/env bash
+# Sincronización automática de herramientas de desarrollo con mise
+# hash: {{ include "dot_config/mise/config.toml" | sha256sum }}
+
+if command -v mise >/dev/null 2>&1; then
+  mise install -y
+fi

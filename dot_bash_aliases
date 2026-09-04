@@ -1,0 +1,111 @@
+# ==============================================================================
+# ~/.bash_aliases - Compatibilidad nativa con Omarchy 4
+# ==============================================================================
+
+# ------------------------------------------------------------------------------
+# 1. NAVEGACIÓN Y LISTADO (eza ya está integrado por Omarchy en ls)
+# ------------------------------------------------------------------------------
+alias ll='ls -lF'
+alias la='ls -A'
+alias l='ls -CF'
+alias cl='clear'
+alias hist='history'
+
+# ------------------------------------------------------------------------------
+# 2. GIT (Equivalentes Oh My Zsh sin colisiones con fns/worktrees)
+# ------------------------------------------------------------------------------
+alias gs='git status -sb'
+
+# 'ga' y 'gd' son funciones nativas de Omarchy. Usamos 'gad' y 'gdf':
+alias gad='git add'
+alias gaa='git add --all'
+alias gapa='git add --patch'
+
+alias gdf='git diff'
+alias gds='git diff --staged'
+
+alias gc='git commit -v'
+alias gca='git commit -v -a'
+alias gco='git checkout'
+alias gcb='git checkout -b'
+
+# gb está libre en Omarchy:
+alias gb='git branch'
+alias gba='git branch -a'
+alias gbd='git branch -d'
+alias gbD='git branch -D'
+alias gbm='git branch -m'
+
+alias gf='git fetch'
+alias gfa='git fetch --all --prune --jobs=10'
+alias gfp='git fetch --prune'
+
+alias gp='git push'
+alias gpf='git push --force-with-lease'
+alias gpl='git pull'
+alias gpr='git pull --rebase'
+
+alias glog='git log --oneline --decorate --graph'
+alias gloga='git log --oneline --decorate --graph --all'
+alias grh='git reset --hard'
+
+# ------------------------------------------------------------------------------
+# 3. DOCKER & COMPOSE
+# ------------------------------------------------------------------------------
+alias dps="docker ps --format 'table {{.Names}}\t{{.Status}}\t{{.Ports}}'"
+alias dpsa="docker ps -a --format 'table {{.Names}}\t{{.Status}}\t{{.Ports}}'"
+alias dcls='docker container ls'
+alias dclsa='docker container ls -a'
+alias dcstart='docker container start'
+alias dcstop='docker container stop'
+alias dcrm='docker container rm'
+alias dcin='docker container inspect'
+
+alias di='docker image'
+alias dils='docker image ls'
+alias dirm='docker image rm'
+alias dipu='docker image push'
+
+alias dvls='docker volume ls'
+alias dvprune='docker volume prune'
+alias dnls='docker network ls'
+alias dnprune='docker network prune'
+alias dprune='docker system prune -af --volumes'
+
+# Docker Compose
+alias dco='docker compose'
+alias dup='docker compose up -d'
+alias ddown='docker compose down'
+alias dstop='docker compose stop'
+alias dstart='docker compose start'
+alias dlogs='docker compose logs -tf --tail=50'
+alias dbuild='docker compose build'
+
+# ------------------------------------------------------------------------------
+# 4. DESARROLLO Y PUERTOS
+# ------------------------------------------------------------------------------
+myport() {
+  sudo ss -tulpn | grep ":$1 "
+}
+
+alias killnode='pkill -f node'
+
+# Consultar alias rápidamente (ejemplo: "als git", "als docker" o "als")
+als() {
+  if [[ -n "$1" ]]; then
+    alias | grep -i "$1" | sed "s/alias //"
+  else
+    alias | sed "s/alias //"
+  fi
+}
+
+# ------------------------------------------------------------------------------
+# 5. DOTFILES & CHEZMOI
+# ------------------------------------------------------------------------------
+alias cz='chezmoi'
+alias czdiff='chezmoi diff'
+alias czst='chezmoi status'
+alias czre='chezmoi re-add'
+alias czcd='chezmoi cd'
+alias czup='chezmoi update'
+alias czsync='chezmoi re-add && chezmoi git add . && chezmoi git commit -v'

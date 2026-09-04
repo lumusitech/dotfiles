@@ -1,0 +1,13 @@
+# Secrets and Credentials Blacklist
+*rclone.conf
+*.key
+*.pem
+*.token
+*.env
+*hosts.yml
+*history*
+id_rsa*
+id_ed25519*
+.DS_Store
+*.swp
+*.bak

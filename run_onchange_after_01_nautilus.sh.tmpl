@@ -1,0 +1,9 @@
+#!/usr/bin/env bash
+# Optimizaciones de Nautilus y Tracker (Omarchy 4)
+# hash: {{ include "dot_config/gtk-3.0/bookmarks" | sha256sum }}
+
+if command -v gsettings >/dev/null 2>&1; then
+  gsettings set org.gnome.nautilus.preferences show-directory-item-counts 'local-only'
+  gsettings set org.gnome.nautilus.preferences show-image-thumbnails 'local-only'
+  touch "$HOME/Drive/.trackerignore" 2>/dev/null || true
+fi

@@ -1,0 +1,27 @@
+# Plantilla para ~/.config/rclone/rclone.conf
+# ATENCION: NUNCA subas tokens reales al repositorio de git.
+# Ejecuta 'rclone config' para autenticar cada cuenta en tu maquina local.
+
+[drive-lumusika]
+type = drive
+scope = drive
+token = {"access_token":"REPLACE_ME","token_type":"Bearer","refresh_token":"REPLACE_ME","expiry":"2026-01-01T00:00:00Z"}
+team_drive = 
+
+[drive-abc]
+type = drive
+scope = drive
+token = {"access_token":"REPLACE_ME","token_type":"Bearer","refresh_token":"REPLACE_ME","expiry":"2026-01-01T00:00:00Z"}
+team_drive = 
+
+[drive-lumusitech]
+type = drive
+scope = drive
+token = {"access_token":"REPLACE_ME","token_type":"Bearer","refresh_token":"REPLACE_ME","expiry":"2026-01-01T00:00:00Z"}
+team_drive = 
+
+[drive-carludev]
+type = drive
+scope = drive
+token = {"access_token":"REPLACE_ME","token_type":"Bearer","refresh_token":"REPLACE_ME","expiry":"2026-01-01T00:00:00Z"}
+team_drive = 
