@@ -100,7 +100,7 @@ als() {
 }
 
 # ------------------------------------------------------------------------------
-# 5. DOTFILES & CHEZMOI
+# 5. DOTFILES & CHEZMOI (Flujo Seguro con Ramas y PRs)
 # ------------------------------------------------------------------------------
 alias cz='chezmoi'
 alias czdiff='chezmoi diff'
@@ -108,4 +108,28 @@ alias czst='chezmoi status'
 alias czre='chezmoi re-add'
 alias czcd='chezmoi cd'
 alias czup='chezmoi update'
-alias czsync='chezmoi re-add && chezmoi git add . && chezmoi git commit -v'
+
+# Crear rama auxiliar para cambios
+czbranch() {
+  git -C ~/.local/share/chezmoi checkout -b "$1"
+}
+
+# Guardar cambios y subir la rama a GitHub
+czpush() {
+  local current_branch
+  current_branch=$(git -C ~/.local/share/chezmoi branch --show-current)
+  if [ "$current_branch" = "main" ]; then
+    echo "❌ Error: La rama 'main' está protegida en GitHub. Crea una rama con 'czbranch <nombre>' antes de pushear."
+    return 1
+  fi
+  chezmoi re-add
+  git -C ~/.local/share/chezmoi add .
+  git -C ~/.local/share/chezmoi commit -v
+  git -C ~/.local/share/chezmoi push -u origin "$current_branch"
+}
+
+# Abrir PR en GitHub Web
+alias czpr='env -u GITHUB_TOKEN gh pr create --repo lumusitech/dotfiles --web'
+
+# Volver a main y sincronizar tras hacer Squash & Merge en GitHub
+alias czmain='git -C ~/.local/share/chezmoi checkout main && git -C ~/.local/share/chezmoi pull && chezmoi apply'
