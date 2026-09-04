@@ -4,83 +4,51 @@ Repositorio integral de configuración, dotfiles y utilitarios para **Omarchy 4*
 
 ---
 
-## 📦 Inventario de Aplicaciones y Dependencias (Por Categoría)
+## 🧭 ¿Qué incluye Omarchy 4 de serie vs. Qué debes instalar?
 
-Para que todos los atajos de teclado, scripts y lanzadores funcionen al 100% en una instalación limpia, este es el stack de software categorizado:
+Omarchy 4 ya viene con un stack muy completo preinstalado en su ISO base (`/usr/share/omarchy/`). Para evitar instalaciones redundantes, esta es la separación exacta:
 
-### 1. Herramientas de Atajos Dedicados & Audio (AUR / Pacman)
-*Requeridos por los atajos de Hyprland (`bindings.lua`) y scripts de control (`~/.local/bin/`):*
-* **`omacalc`** (AUR): Calculadora flotante nativa en Qt Quick $\rightarrow$ atajo `SUPER + ALT + C`.
-* **`cliamp`** (AUR): Reproductor de audio retro Winamp para terminal $\rightarrow$ atajo `SUPER + R`.
-* **`voxtype-bin`** (AUR): Dictado por voz Push-to-Talk y traducción en tiempo real $\rightarrow$ atajos `F9` (dictado ES) y `F10` (traducción EN).
-* **`mpv` & `imv`**: Reproductor multimedia y visor ligero de imágenes.
+### ✅ Ya incluido de fábrica en Omarchy 4 (NO necesitas instalarlo):
+* **Herramientas de sistema y atajos:** `omacalc` (calculadora oficial), `cliamp` (reproductor de música en terminal), `btop`, `fd`, `ripgrep`, `bat`, `docker`, `docker-compose`, `python-gobject`, `mpv`, `imv`, `lazygit`, `fastfetch`, `mise-bin`.
+* **Webapps base:** `Basecamp`, `HEY`, `Discord`, `Zoom`, `X`, `YouTube`, `WhatsApp`, `Google Maps`, `Google Messages`, `Google Photos`.
 
+---
+
+### 📥 El Delta que SÍ debes instalar (Lo que no viene en la ISO):
+
+Todos los comandos utilizan el flag `--needed`, por lo que son **100% idempotentes** (si un paquete ya existe, pacman/yay lo omite automáticamente sin reinstalarlo ni reejecutar hooks):
+
+#### 1. Almacenamiento, FUSE y Discos NTFS
 ```bash
-yay -S --needed omacalc cliamp voxtype-bin mpv imv
+sudo pacman -S --needed rclone fuse3 ntfs-3g
 ```
 
-### 2. Almacenamiento, FUSE & Nube
-*Requeridos para montar unidades locales NTFS fijas y sincronizar Google Drive con Rclone:*
-* **`rclone` & `fuse3`**: Motor de sincronización y montaje en espacio de usuario.
-* **`ntfs-3g`**: Soporte de lectura y escritura para discos físicos Windows (`/mnt/DATOS-2TB`, `/mnt/BACKUP-1TB`, `/mnt/BACKUP-4TB`).
-* **`python-gobject`**: Resuelve dependencias de extensiones de Nautilus y previene bloqueos.
-
+#### 2. Atajos Especiales & Dictado
+* `voxtype-bin` es requerido para los atajos `F9` (dictado en español) y `F10` (traducción en tiempo real a inglés) definidos en `bindings.lua`:
 ```bash
-sudo pacman -S --needed rclone fuse3 ntfs-3g python-gobject
+yay -S --needed voxtype-bin
 ```
 
-### 3. Ofimática, Fuentes & Documentos
-*Compatibilidad nativa con documentos de Microsoft 365 y visualización tipográfica idéntica:*
-* **`onlyoffice-bin`** (AUR): Suite ofimática predeterminada para docx, xlsx, pptx.
-* **Fuentes Microsoft**: `ttf-ms-fonts`, `ttf-vista-fonts`, `ttf-aptos-fonts`.
-
+#### 3. Ofimática y Tipografías MS
 ```bash
 yay -S --needed onlyoffice-bin ttf-ms-fonts ttf-vista-fonts ttf-aptos-fonts
 fc-cache -fv
 ```
 
-### 4. Desarrollo, Terminal & Runtimes
-* **`docker` & `docker-compose`**: Contenedores para desarrollo.
-* **Herramientas CLI Rust**: `btop` (monitoreo), `fd` (búsqueda de archivos), `ripgrep` (búsqueda de código), `bat` (visualizador con resaltado).
-* **Runtimes centralizados con `mise`**:
-  * Node.js (26.7.0), Java (Temurin-25 LTS), Bun, Go, Python, Deno, pnpm, chezmoi.
-  *(Se instalan de forma desatendida vía el hook automático `03_mise.sh` al sincronizar este repositorio).*
-
-```bash
-sudo pacman -S --needed btop fd ripgrep bat docker docker-compose
-sudo usermod -aG docker $USER
-```
-
 ---
 
-## 🌐 Webapps Integradas de Omarchy 4
+## 🌐 Webapps Personalizadas Integradas
 
-> [!NOTE]
-> **¡Ya están incluidas en este repositorio!**
-> Todos los archivos `.desktop` (`~/.local/share/applications/`) y sus iconos de alta resolución en 256x256 (`~/.local/share/icons/hicolor/256x256/apps/`) están versionados en Chezmoi. Al ejecutar `chezmoi apply`, aparecerán de inmediato en tu lanzador de aplicaciones.
+Las webapps predeterminadas de Omarchy vienen en `/usr/share/omarchy/applications/`. En este repositorio de Chezmoi se respaldan **exclusivamente tus lanzadores y extensiones personalizadas** junto con sus iconos en `~/.local/share/icons/hicolor/256x256/apps/`:
 
-### Catálogo de Webapps Versionadas:
-* **Productividad & Google Workspace:**
+* **Google Workspace Personal & Corporativo:**
   * Google Gemini (`SUPER + SHIFT + A`), Gemini NotebookLM
   * Google Gmail, Google Calendar, Google Keep, Google Tasks, Google Contacts
   * Google Drive (Personal) y Google Drive ABC
-  * Google Meet, Google Translate, Google Sheets (con handler propio en `~/.local/bin/open-google-sheet`), Google Vids, Google Books
-* **Comunicación & Redes:**
-  * WhatsApp Web (`SUPER + ALT + M`)
-  * YouTube & YouTube Music (`SUPER + M`)
-  * Discord, Zoom, HEY, Basecamp, Facebook, X (Twitter)
-* **Educación & Desarrollo:**
+  * Google Meet, Google Translate, Google Sheets (con handler `open-google-sheet`), Google Vids, Google Books
+* **Streaming & Educación:**
+  * YouTube Music (`SUPER + M`)
   * DevTalles, Udemy, GitHub, Microsoft OneDrive
-
-### ¿Cómo registrar una nueva Webapp en el futuro?
-Si instalas una webapp adicional usando la herramienta de Omarchy:
-```bash
-omarchy-webapp-install "NombreApp" "https://url-de-la-app.com" "icono.png"
-# Para respaldarla en este repositorio:
-chezmoi add ~/.local/share/applications/NombreApp.desktop
-chezmoi add ~/.local/share/icons/hicolor/256x256/apps/nombreapp.png
-chezmoi git commit -m "feat(webapp): agregar NombreApp" && chezmoi git push
-```
 
 ---
 
@@ -91,7 +59,7 @@ Si reinstalas el sistema de cero:
 ```mermaid
 flowchart TD
     A["1. Instalar Omarchy 4"] --> B["2. Configurar /etc/fstab y Discos NTFS"]
-    B --> C["3. Instalar Paquetes Base (pacman + yay)"]
+    B --> C["3. Instalar Paquetes Faltantes (Delta)"]
     C --> D["4. Aplicar Dotfiles con Chezmoi"]
     D --> E["5. Restaurar rclone.conf y Disfrutar"]
 ```
@@ -100,21 +68,16 @@ flowchart TD
 Instalar Omarchy 4 desde la ISO oficial y reiniciar.
 
 ### Paso 2: Discos Físicos (/etc/fstab)
-Crear los puntos de montaje y configurar `/etc/fstab` (según `omarchy4-storage-workflow-runbook.md`):
+Configurar los montajes de discos NTFS en `/etc/fstab` (según `omarchy4-storage-workflow-runbook.md`):
 ```bash
 sudo mkdir -p /mnt/DATOS-2TB /mnt/BACKUP-1TB /mnt/BACKUP-4TB
 sudo mount -a
 ```
 
-### Paso 3: Paquetes y Dependencias
-Instalar todos los paquetes agrupados:
+### Paso 3: Instalar únicamente el Delta
 ```bash
-# Pacman:
-sudo pacman -S --needed rclone fuse3 ntfs-3g python-gobject btop fd ripgrep bat docker docker-compose mpv imv
-sudo usermod -aG docker $USER
-
-# AUR (yay):
-yay -S --needed omacalc cliamp voxtype-bin onlyoffice-bin ttf-ms-fonts ttf-vista-fonts ttf-aptos-fonts
+sudo pacman -S --needed rclone fuse3 ntfs-3g
+yay -S --needed voxtype-bin onlyoffice-bin ttf-ms-fonts ttf-vista-fonts ttf-aptos-fonts
 fc-cache -fv
 ```
 
@@ -123,10 +86,10 @@ fc-cache -fv
 # 1. Instalar chezmoi (vía mise o pacman)
 mise use -g chezmoi || sudo pacman -S chezmoi
 
-# 2. Inicializar y aplicar todo tu entorno en 1 solo paso:
+# 2. Inicializar y aplicar todo tu entorno:
 chezmoi init --apply https://github.com/lumusitech/dotfiles.git
 ```
-*Chezmoi ejecutará los scripts automáticos para:*
+*Los hooks automáticos de Chezmoi se encargarán de:*
 * Sincronizar todos los runtimes (`Node`, `Java`, `Python`, etc.) con `mise install`.
 * Habilitar y levantar los 4 servicios de `rclone-mount@` en `systemd --user`.
 * Aplicar optimizaciones de visualización rápida en Nautilus.
