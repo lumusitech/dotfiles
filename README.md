@@ -95,12 +95,12 @@ chezmoi init --apply https://github.com/lumusitech/dotfiles.git
 *Los hooks automáticos de Chezmoi se encargarán de:*
 * Sincronizar runtimes (`Node`, `Java`, `Python`, etc.) con `mise install`.
 * Descargar el modelo Whisper `small` de Voxtype de forma desatendida.
-* Habilitar y arrancar servicios de usuario (`rclone-mount@` y `voxtype.service`).
+* Habilitar y arrancar servicios de usuario (`rclone-mount@`, `onedrive-mount@`, `voxtype.service` y `notify-video-editor.service`).
 * Aplicar optimizaciones de visualización en Nautilus.
 * Desplegar todos los atajos de teclado, scripts de `~/.local/bin/`, webapps e iconos.
 
 ### Paso 5: Credenciales Cloud
-Copiar tu archivo `rclone.conf` con las credenciales de Google Drive hacia `~/.config/rclone/rclone.conf` (plantilla de referencia en `docs/rclone.conf.example`).
+Copiar tu archivo `rclone.conf` con las credenciales de Google Drive y OneDrive hacia `~/.config/rclone/rclone.conf` (plantilla de referencia en `docs/rclone.conf.example`).
 
 ---
 
