@@ -175,8 +175,9 @@ czmain
 ```
 *Este comando:*
 1. Te regresa a la rama `main` local.
-2. Descarga el commit limpio recién mergeado (`git pull`).
-3. Aplica los cambios en tu sistema (`chezmoi apply`).
+2. Descarga el commit limpio recién mergeado y poda referencias (`git pull --prune`).
+3. **Elimina automáticamente la rama auxiliar local** en la que estabas y barre cualquier otra rama huérfana vieja (`[gone]`).
+4. Aplica los cambios en tu sistema (`chezmoi apply`).
 
 ---
 
@@ -189,7 +190,7 @@ czmain
 | **`czbranch <nombre>`** | Crear y cambiar a una rama de trabajo auxiliar en Chezmoi. |
 | **`czpush`** | Absorber cambios, commitear y subir la rama a GitHub. |
 | **`czpr`** | Abrir la web de GitHub para crear el Pull Request. |
-| **`czmain`** | Cambiar a `main`, descargar lo mergeado y aplicar a tu sistema. |
+| **`czmain`** | Cambiar a `main`, descargar lo mergeado, auto-eliminar ramas del PR y aplicar dotfiles. |
 | **`czcd`** | Abrir una sub-terminal directamente dentro del repositorio Chezmoi. |
 | **`czup`** | En otra computadora: descargar lo último de GitHub y aplicarlo de inmediato. |
 
