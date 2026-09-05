@@ -132,6 +132,7 @@ czpush() {
 alias czpr='env -u GITHUB_TOKEN gh pr create --repo lumusitech/dotfiles --web'
 
 # Volver a main, sincronizar, auto-eliminar la rama local del PR y aplicar dotfiles
+unalias czmain 2>/dev/null
 czmain() {
   local repo="$HOME/.local/share/chezmoi"
   local prev_branch
