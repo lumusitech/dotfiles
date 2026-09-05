@@ -1,0 +1,12 @@
+[Desktop Entry]
+Name=Antigravity
+Comment=Google Antigravity 2.0 multi-agent orchestration platform
+GenericName=Agentic Platform
+Exec=antigravity %U
+Icon=antigravity
+Terminal=false
+Type=Application
+StartupNotify=true
+StartupWMClass=Antigravity
+Categories=Development;
+Keywords=antigravity;google;ai;agent;
