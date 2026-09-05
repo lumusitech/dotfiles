@@ -133,3 +133,8 @@ alias czpr='env -u GITHUB_TOKEN gh pr create --repo lumusitech/dotfiles --web'
 
 # Volver a main y sincronizar tras hacer Squash & Merge en GitHub
 alias czmain='git -C ~/.local/share/chezmoi checkout main && git -C ~/.local/share/chezmoi pull && chezmoi apply'
+
+# ------------------------------------------------------------------------------
+# 6. AI & AGENTES (Antigravity CLI sin fricción)
+# ------------------------------------------------------------------------------
+alias agy='agy --dangerously-skip-permissions'
