@@ -34,6 +34,6 @@
 	pager = 
 	autocrlf = input
 [credential "https://gist.github.com"]
-	helper = !env -u GITHUB_TOKEN -u GH_TOKEN /home/carludev/.local/share/mise/installs/gh/latest/gh_2.99.0_linux_amd64/bin/gh auth git-credential
+	helper = !env -u GITHUB_TOKEN -u GH_TOKEN gh auth git-credential
 [credential "https://github.com"]
-	helper = !env -u GITHUB_TOKEN -u GH_TOKEN /home/carludev/.local/share/mise/installs/gh/latest/gh_2.99.0_linux_amd64/bin/gh auth git-credential
+	helper = !env -u GITHUB_TOKEN -u GH_TOKEN gh auth git-credential
