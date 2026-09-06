@@ -140,3 +140,10 @@ sudo rm -f /etc/fonts/conf.d/48-guessfamily.conf /etc/fonts/conf.d/48-spacing.co
 sudo pacman -S --needed fontconfig
 fc-cache -r -v
 ```
+
+* **Omarchy 4 - Windows VM (Permisos 700 y eliminación de bit setgid):**
+Omarchy 4 implementa aislamiento de monturas en `/var/lib/omarchy/windows/mounts/users/<uid>/` y valida estrictamente que `~/.windows` y `~/Windows` tengan permisos `700`. Si `~/Windows` posee el bit `setgid` activo (`2700`, común en carpetas compartidas/Samba), el pre-vuelo de monturas falla silenciosamente y bloquea tanto el inicio (`launch`) como la desinstalación (`remove`).
+```bash
+# Limpiar el bit setgid (00700) y forzar permisos 700
+chmod 00700 ~/Windows ~/.windows
+```
