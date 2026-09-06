@@ -147,3 +147,23 @@ Omarchy 4 implementa aislamiento de monturas en `/var/lib/omarchy/windows/mounts
 # Limpiar el bit setgid (00700) y forzar permisos 700
 chmod 00700 ~/Windows ~/.windows
 ```
+
+* **Suspensión Profunda / Prevención de Despertar Instantáneo (Instant Wake):**
+Evita que eventos espurios en buses PCIe (dispositivos NVMe, interfaces de red) o periféricos USB (sensores de ratón óptico) despierten el equipo de inmediato tras suspender. Se configura una unidad systemd oneshot antes de `sleep.target` para deshabilitar los triggers en sysfs, permitiendo que la máquina solo se reactive presionando el botón físico de encendido (*Power*):
+```bash
+sudo tee /etc/systemd/system/disable-wakeup-triggers.service << 'EOF'
+[Unit]
+Description=Disable PCIe/USB wakeup triggers to prevent instant resume
+Before=sleep.target
+
+[Service]
+Type=oneshot
+ExecStart=/bin/sh -c 'for dev in /sys/bus/pci/devices/*/power/wakeup; do [ -f "$dev" ] && echo disabled > "$dev" 2>/dev/null || true; done; for dev in /sys/bus/usb/devices/*/power/wakeup; do [ -f "$dev" ] && echo disabled > "$dev" 2>/dev/null || true; done'
+
+[Install]
+WantedBy=sleep.target
+EOF
+
+sudo systemctl daemon-reload
+sudo systemctl enable disable-wakeup-triggers.service
+```

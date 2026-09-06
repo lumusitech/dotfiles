@@ -1,0 +1,10 @@
+[Unit]
+Description=Disable PCIe/USB wakeup triggers to prevent instant resume
+Before=sleep.target
+
+[Service]
+Type=oneshot
+ExecStart=/bin/sh -c 'for dev in /sys/bus/pci/devices/*/power/wakeup; do [ -f "$dev" ] && echo disabled > "$dev" 2>/dev/null || true; done; for dev in /sys/bus/usb/devices/*/power/wakeup; do [ -f "$dev" ] && echo disabled > "$dev" 2>/dev/null || true; done'
+
+[Install]
+WantedBy=sleep.target
