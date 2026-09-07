@@ -1,9 +1,9 @@
 #!/usr/bin/env bash
 if hyprctl clients | grep -B 15 "class: chrome-web.whatsapp.com__-Default" | grep -q "workspace:.*special:whatsapp"; then
-    hyprctl dispatch 'hl.dsp.workspace.toggle_special("whatsapp")'
+    hyprctl dispatch togglespecialworkspace whatsapp
 else
     if ! hyprctl monitors | grep -q "special:whatsapp"; then
-        hyprctl dispatch 'hl.dsp.workspace.toggle_special("whatsapp")'
+        hyprctl dispatch togglespecialworkspace whatsapp
     fi
-    hyprctl dispatch 'hl.dsp.exec_cmd("omarchy-launch-webapp https://web.whatsapp.com/")'
+    hyprctl dispatch exec "$HOME/.local/bin/launch-webapp https://web.whatsapp.com/"
 fi

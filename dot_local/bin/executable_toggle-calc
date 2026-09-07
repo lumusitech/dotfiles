@@ -1,9 +1,16 @@
 #!/usr/bin/env bash
-if hyprctl clients | grep -B 15 -iE "(class:.*omacalc|title:.*omacalc)" | grep -q "workspace:.*special:calc"; then
-    hyprctl dispatch 'hl.dsp.workspace.toggle_special("calc")'
+if hyprctl clients | grep -B 15 -iE "(class:.*calc|title:.*calc)" | grep -q "workspace:.*special:calc"; then
+    hyprctl dispatch togglespecialworkspace calc
 else
     if ! hyprctl monitors | grep -q "special:calc"; then
-        hyprctl dispatch 'hl.dsp.workspace.toggle_special("calc")'
+        hyprctl dispatch togglespecialworkspace calc
     fi
-    hyprctl dispatch 'hl.dsp.exec_cmd("omacalc")'
+    CALC_CMD="galculator"
+    for c in omacalc kcalc galculator gnome-calculator; do
+        if command -v "$c" >/dev/null 2>&1; then
+            CALC_CMD="$c"
+            break
+        fi
+    done
+    hyprctl dispatch exec "$CALC_CMD"
 fi

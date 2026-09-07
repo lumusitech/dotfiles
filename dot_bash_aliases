@@ -1,13 +1,20 @@
 # ==============================================================================
-# ~/.bash_aliases - Compatibilidad nativa con Omarchy 4
+# ~/.bash_aliases - Compatibilidad nativa con CachyOS & Arch Linux
 # ==============================================================================
 
 # ------------------------------------------------------------------------------
-# 1. NAVEGACIÓN Y LISTADO (eza ya está integrado por Omarchy en ls)
+# 1. NAVEGACIÓN Y LISTADO
 # ------------------------------------------------------------------------------
-alias ll='ls -lF'
-alias la='ls -A'
-alias l='ls -CF'
+if command -v eza >/dev/null 2>&1; then
+  alias ls='eza --icons'
+  alias ll='eza -lF --icons'
+  alias la='eza -a --icons'
+  alias l='eza -CF --icons'
+else
+  alias ll='ls -lF'
+  alias la='ls -A'
+  alias l='ls -CF'
+fi
 alias cl='clear'
 alias hist='history'
 

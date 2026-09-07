@@ -1,9 +1,9 @@
 #!/usr/bin/env bash
 if hyprctl clients | grep -B 15 "title: QuickNotes" | grep -q "workspace:.*special:notes"; then
-    hyprctl dispatch 'hl.dsp.workspace.toggle_special("notes")'
+    hyprctl dispatch togglespecialworkspace notes
 else
     if ! hyprctl monitors | grep -q "special:notes"; then
-        hyprctl dispatch 'hl.dsp.workspace.toggle_special("notes")'
+        hyprctl dispatch togglespecialworkspace notes
     fi
-    hyprctl dispatch "hl.dsp.exec_cmd(\"foot --title=QuickNotes -e nvim $HOME/notes.md\")"
+    hyprctl dispatch exec "foot --title=QuickNotes -e nvim $HOME/notes.md"
 fi
