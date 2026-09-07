@@ -28,13 +28,17 @@ Integración Push-to-Talk de dictado por voz ultrarrápido con modelos Whisper l
 
 Todos los comandos son **100% idempotentes** gracias a la bandera `--needed`:
 
-### 1. Sistema Base, Terminal y Herramientas (Pacman)
+### 1. Sistema Base, Terminal y Stack Neovim / LazyVim (Pacman)
 ```bash
 sudo pacman -S --needed \
   rclone fuse3 ntfs-3g \
-  btop fd ripgrep bat \
+  neovim gcc make tree-sitter-cli \
+  ripgrep fd fzf bat btop \
+  git lazygit wl-clipboard \
+  unzip tar curl wget jq \
   docker docker-compose \
-  mpv imv lazygit fastfetch eza socat freerdp libnotify foot jq
+  mpv imv fastfetch eza socat freerdp libnotify foot \
+  ttf-jetbrains-mono-nerd chezmoi
 ```
 
 ### 2. Paquetes AUR & Productividad (Paru)
@@ -76,8 +80,21 @@ sudo mount -a
 
 ### Paso 3: Instalar Paquetes
 ```bash
-sudo pacman -S --needed rclone fuse3 ntfs-3g btop fd ripgrep bat docker docker-compose mpv imv lazygit fastfetch eza socat freerdp libnotify foot jq
-paru -S --needed mise-bin voxtype-bin onlyoffice-bin ttf-ms-fonts ttf-vista-fonts ttf-aptos-fonts galculator translate-shell
+sudo pacman -S --needed \
+  rclone fuse3 ntfs-3g \
+  neovim gcc make tree-sitter-cli \
+  ripgrep fd fzf bat btop \
+  git lazygit wl-clipboard \
+  unzip tar curl wget jq \
+  docker docker-compose \
+  mpv imv fastfetch eza socat freerdp libnotify foot \
+  ttf-jetbrains-mono-nerd chezmoi
+
+paru -S --needed \
+  mise-bin voxtype-bin onlyoffice-bin \
+  ttf-ms-fonts ttf-vista-fonts ttf-aptos-fonts \
+  galculator translate-shell
+
 fc-cache -fv
 
 # Habilitar servicio Docker e incorporar usuario al grupo
@@ -105,9 +122,9 @@ Copiar tu archivo `rclone.conf` con las credenciales de Google Drive y OneDrive 
 
 ---
 
-## 🪟 Virtualización: Windows 11 VM en Omarchy 4
+## 🪟 Virtualización: Windows 11 VM (Docker / KVM)
 
-Omarchy 4 integra virtualización KVM asistida por Docker (`dockurr/windows`) con acceso por FreeRDP (`xfreerdp3`), escalado HiDPI dinámico en Hyprland y ciclo de vida automatizado vía el script [`launch-windows-vm`](dot_local/bin/executable_launch-windows-vm).
+Virtualización KVM asistida por Docker (`dockurr/windows`) con acceso por FreeRDP (`xfreerdp3`), escalado HiDPI dinámico en Hyprland y ciclo de vida automatizado vía el script [`launch-windows-vm`](dot_local/bin/executable_launch-windows-vm).
 
 * **Arranque y sondeo activo:** Espera automáticamente la disponibilidad del protocolo RDP (X.224) antes de conectar.
 * **Seguridad y compatibilidad:** Forzado de `/sec:tls /cert:ignore` para compatibilidad con la configuración de `dockurr/windows` (`UserAuthentication=0`).
