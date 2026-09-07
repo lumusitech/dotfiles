@@ -152,6 +152,16 @@ chmod 00700 ~/Windows ~/.windows
 touch ~/Windows/.keep
 ```
 
+* **Omarchy 4 - Windows 11 VM (Activación Comunitaria de Código Abierto - MAS):**
+En entornos de desarrollo, laboratorios y máquinas virtuales sobre Linux (como el contenedor `dockurr/windows` en Omarchy), la solución estándar recomendada y adoptada por la comunidad es **Microsoft Activation Scripts (MAS)**, respaldada por repositorios públicos de GitHub ([massgravel/Microsoft-Activation-Scripts](https://github.com/massgravel/Microsoft-Activation-Scripts)).
+No requiere instalar binarios sospechosos ni gastar dinero en claves comerciales que corren riesgo de invalidarse si se destruye o recrea el contenedor/disco virtual.
+1. Iniciar Windows 11 y abrir **PowerShell como Administrador**.
+2. Ejecutar:
+```powershell
+irm https://get.activated.win | iex
+```
+3. Seleccionar la opción **HWID** (*Hardware ID digital persistente*, recomendada) o **KMS38**. Se activa de por vida en segundos ante los servidores oficiales de Microsoft sin dejar procesos en segundo plano. (Detalles en [`docs/windows-vm-activation.md`](docs/windows-vm-activation.md)).
+
 * **Suspensión Profunda / Prevención de Despertar Instantáneo (Instant Wake):**
 Evita que eventos espurios en buses PCIe (dispositivos NVMe, interfaces de red) o periféricos USB (sensores de ratón óptico) despierten el equipo de inmediato tras suspender. Se configura una unidad systemd oneshot antes de `sleep.target` para deshabilitar los triggers en sysfs, permitiendo que la máquina solo se reactive presionando el botón físico de encendido (*Power*):
 ```bash
