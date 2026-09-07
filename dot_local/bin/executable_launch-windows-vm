@@ -29,13 +29,29 @@ done
 
 notify() {
   local urgency="${1:-normal}"
-  local title="$2"
-  local msg="$3"
+  local title="${2:-Windows 11 VM}"
+  local msg="${3:-}"
   if command -v omarchy-notification-send >/dev/null 2>&1; then
     omarchy-notification-send -g "󰍲" -u "$urgency" "$title" "$msg"
   elif command -v notify-send >/dev/null 2>&1; then
     notify-send -u "$urgency" "$title" "$msg"
   fi
+}
+
+start_vm_container() {
+  (
+    set +u
+    source /usr/bin/omarchy-windows-vm "" >/dev/null 2>&1
+    priv up
+  )
+}
+
+stop_vm_container() {
+  (
+    set +u
+    source /usr/bin/omarchy-windows-vm "" >/dev/null 2>&1
+    priv down
+  )
 }
 
 # 1. Verificar si el contenedor está en ejecución
@@ -47,8 +63,7 @@ STATUS=$(get_container_status)
 
 if [[ "$STATUS" != "running" ]]; then
   notify normal "Windows 11 VM" "Iniciando máquina virtual en segundo plano..."
-  # Usar priv up de omarchy-windows-vm (gestiona permisos, bind mounts y dockerd)
-  if ! ( source /usr/bin/omarchy-windows-vm >/dev/null 2>&1 && priv up ); then
+  if ! start_vm_container; then
     notify critical "Windows 11 VM" "Error al iniciar el contenedor de la máquina virtual."
     exit 1
   fi
@@ -85,7 +100,7 @@ except Exception:
 if ! wait_for_rdp; then
   notify critical "Windows 11 VM" "Tiempo de espera agotado esperando el servicio de Escritorio Remoto (RDP)."
   if [[ "$KEEP_ALIVE" != "true" ]]; then
-    ( source /usr/bin/omarchy-windows-vm >/dev/null 2>&1 && priv down ) || true
+    stop_vm_container || true
   fi
   exit 1
 fi
@@ -154,5 +169,5 @@ fi
 
 if [[ "$KEEP_ALIVE" != "true" ]]; then
   notify low "Windows 11 VM" "Sesión cerrada. Deteniendo máquina virtual..."
-  ( source /usr/bin/omarchy-windows-vm >/dev/null 2>&1 && priv down ) || true
+  stop_vm_container || true
 fi
