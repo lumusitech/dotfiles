@@ -71,6 +71,29 @@ omarchy-windows-vm stop
 
 ---
 
+## 🐛 Bug Report y Estado Actual (Pendiente de Resolución)
+
+### Comportamiento observado:
+Al invocar `launch-windows-vm` (tanto desde Walker/menú de apps como desde terminal):
+1. Se emiten las notificaciones de inicio y preparación:
+   * *"Iniciando máquina virtual en segundo plano..."*
+   * *"Esperando a que Windows 11 complete el inicio del sistema..."*
+2. A los pocos segundos, sin llegar a renderizarse la ventana interactiva de `xfreerdp3`, se dispara la notificación:
+   * *"Sesión cerrada. Deteniendo máquina virtual..."*
+3. Como `KEEP_ALIVE=false` por defecto, el script interpreta el cierre inmediato de FreeRDP como el fin de la sesión del usuario y ejecuta `stop_vm_container` (`priv down`), apagando la VM.
+
+### Diagnóstico preliminar e hipótesis:
+* **Cierre prematuro del proceso `xfreerdp3`:** El cliente RDP puede estar cerrándose inmediatamente debido a validación de certificados TLS (`/cert:ignore`), parámetros incompatibles en modo pantalla completa sobre Wayland/Hyprland, o credenciales rechazadas.
+* **Falso positivo de disponibilidad RDP:** Es posible que el sondeo X.224 en el puerto `127.0.0.1:3389` reciba una respuesta a nivel de socket antes de que el servicio `TermService` de Windows esté listo para iniciar la sesión gráfica de usuario.
+
+### Hoja de ruta para resolver (Mañana):
+- [ ] Desviar salida estándar y errores de FreeRDP a log permanente: `~/.local/state/windows-vm-rdp.log`.
+- [ ] Ejecutar la VM con persistencia (`launch-windows-vm --keep-alive`) y probar la invocación directa y aislada de `xfreerdp3` en una terminal con `/log-level:DEBUG`.
+- [ ] Ajustar flags de compatibilidad en FreeRDP (`/network:lan`, `/gfx`, etc.) o forzar backend X11/Wayland según convenga.
+
+---
+
 ## 🔗 Referencias Relacionadas
 * [Activación con Microsoft Activation Scripts (MAS)](windows-vm-activation.md)
 * [Repositorio oficial dockurr/windows](https://github.com/dockur/windows)
+

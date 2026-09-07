@@ -104,6 +104,23 @@ Copiar tu archivo `rclone.conf` con las credenciales de Google Drive y OneDrive 
 
 ---
 
+## 🪟 Virtualización: Windows 11 VM en Omarchy 4
+
+Omarchy 4 integra virtualización KVM asistida por Docker (`dockurr/windows`) con acceso por FreeRDP (`xfreerdp3`) y escalado HiDPI dinámico en Hyprland.
+
+> [!WARNING]
+> ### 🐛 Bug Conocido: Cierre prematuro de sesión FreeRDP (Pendiente de resolución)
+> **Síntoma:** Al invocar el lanzador `launch-windows-vm` (o desde el menú de aplicaciones), aparecen las notificaciones de inicio y sondeo del servicio RDP, pero FreeRDP finaliza de forma inmediata a los pocos segundos provocando el apagado automático del contenedor (*"Sesión cerrada. Deteniendo máquina virtual..."*).
+>
+> **Líneas de investigación para la próxima sesión:**
+> 1. **Captura de logs de FreeRDP:** Desviar `stdout`/`stderr` de `xfreerdp3` hacia un archivo de log (`~/.local/state/windows-vm-rdp.log`) para identificar el código de error exacto (certificados, handshake CredSSP, timeout o fallo de renderizado Wayland).
+> 2. **Sondeo activo de RDP:** Verificar si el sondeo X.224 en el puerto 3389 recibe un ACK prematuro antes de que el subsistema de login (`winlogon`/`TermService`) esté listo para recibir autenticación.
+> 3. **Prueba en modo persistente:** Ejecutar `launch-windows-vm --keep-alive` y conectar manualmente con `xfreerdp3` para observar el comportamiento interactivo.
+>
+> 📖 Documentación técnica completa y runbook: [`docs/windows-vm.md`](docs/windows-vm.md).
+
+---
+
 ## 🛡️ Guía Paso a Paso: Cómo Modificar y Guardar tus Dotfiles
 
 La rama principal **`main` está protegida en GitHub**. Nadie puede hacer push directo para evitar romper configuraciones en producción.
