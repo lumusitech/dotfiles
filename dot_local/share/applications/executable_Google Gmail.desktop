@@ -2,7 +2,7 @@
 Version=1.0
 Name=Google Gmail
 Comment=Google Gmail
-Exec=omarchy-launch-webapp "https://mail.google.com/mail/u/0/#inbox"
+Exec=launch-webapp "https://mail.google.com/mail/u/0/#inbox"
 Terminal=false
 Type=Application
 Icon=google-gmail

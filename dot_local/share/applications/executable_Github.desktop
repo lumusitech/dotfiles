@@ -2,7 +2,7 @@
 Version=1.0
 Name=Github
 Comment=Github
-Exec=omarchy-launch-webapp "https://github.com/lumusitech?tab=repositories"
+Exec=launch-webapp "https://github.com/lumusitech?tab=repositories"
 Terminal=false
 Type=Application
 Icon=github

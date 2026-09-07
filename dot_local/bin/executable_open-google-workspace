@@ -6,18 +6,10 @@ if [[ -f "$TARGET" ]]; then
   URL=$(grep -oP 'https://docs\.google\.com/[^"'\'' ]+' "$TARGET" | head -n 1)
   
   if [[ -n "$URL" ]]; then
-    # Deriva a la WebApp correspondiente según la URL
-    if [[ "$URL" == *"spreadsheets"* ]]; then
-      exec omarchy-launch-webapp "$URL"
-    elif [[ "$URL" == *"document"* ]]; then
-      exec omarchy-launch-webapp "$URL"
-    elif [[ "$URL" == *"presentation"* ]]; then
-      exec omarchy-launch-webapp "$URL"
-    else
-      exec omarchy-launch-webapp "$URL"
-    fi
+    exec launch-webapp "$URL"
   fi
 fi
 
 # Fallback si se abre sin archivo
-exec omarchy-launch-webapp "${TARGET:-https://drive.google.com}"
+exec launch-webapp "${TARGET:-https://drive.google.com}"
+

@@ -1,11 +1,11 @@
 #!/usr/bin/env bash
 # ==============================================================================
-# launch-windows-vm - Lanzador robusto de Windows 11 VM para Omarchy 4
+# launch-windows-vm - Lanzador robusto de Windows 11 VM para CachyOS / Arch Linux
 #
 # Soluciona la desconexión prematura de xfreerdp3 al esperar activamente a que
 # el puerto RDP (3389) esté listo y responda al protocolo antes de conectar.
-# Soporta arranque de contenedor vía omarchy-windows-vm priv up, notificaciones
-# de escritorio y apagado automático o persistente (--keep-alive / -k).
+# Soporta arranque de contenedor vía docker compose, notificaciones de escritorio
+# y apagado automático o persistente (--keep-alive / -k).
 # ==============================================================================
 
 set -euo pipefail
@@ -187,7 +187,7 @@ RDP_OPTS=(
   /sound
   /microphone
   /clipboard
-  /title:"Windows 11 - Omarchy"
+  /title:"Windows 11"
   /dynamic-resolution
   /gfx:AVC444
   /floatbar:sticky:off,default:visible,show:fullscreen

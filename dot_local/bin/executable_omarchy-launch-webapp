@@ -1,3 +1,0 @@
-#!/usr/bin/env bash
-# Wrapper de compatibilidad hacia launch-webapp para dotfiles heredados de Omarchy
-exec "$HOME/.local/bin/launch-webapp" "$@"

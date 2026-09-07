@@ -23,7 +23,6 @@ alias hist='history'
 # ------------------------------------------------------------------------------
 alias gs='git status -sb'
 
-# 'ga' y 'gd' son funciones nativas de Omarchy. Usamos 'gad' y 'gdf':
 alias gad='git add'
 alias gaa='git add --all'
 alias gapa='git add --patch'
@@ -36,7 +35,6 @@ alias gca='git commit -v -a'
 alias gco='git checkout'
 alias gcb='git checkout -b'
 
-# gb está libre en Omarchy:
 alias gb='git branch'
 alias gba='git branch -a'
 alias gbd='git branch -d'

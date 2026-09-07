@@ -2,7 +2,7 @@
 Version=1.0
 Name=Google Translate
 Comment=Google Translate
-Exec=omarchy-launch-webapp "https://translate.google.com/?sl=en&tl=es&op=translate"
+Exec=launch-webapp "https://translate.google.com/?sl=en&tl=es&op=translate"
 Terminal=false
 Type=Application
 Icon=google-translate
