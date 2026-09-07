@@ -106,18 +106,14 @@ Copiar tu archivo `rclone.conf` con las credenciales de Google Drive y OneDrive 
 
 ## 🪟 Virtualización: Windows 11 VM en Omarchy 4
 
-Omarchy 4 integra virtualización KVM asistida por Docker (`dockurr/windows`) con acceso por FreeRDP (`xfreerdp3`) y escalado HiDPI dinámico en Hyprland.
+Omarchy 4 integra virtualización KVM asistida por Docker (`dockurr/windows`) con acceso por FreeRDP (`xfreerdp3`), escalado HiDPI dinámico en Hyprland y ciclo de vida automatizado vía el script [`launch-windows-vm`](dot_local/bin/executable_launch-windows-vm).
 
-> [!WARNING]
-> ### 🐛 Bug Conocido: Cierre prematuro de sesión FreeRDP (Pendiente de resolución)
-> **Síntoma:** Al invocar el lanzador `launch-windows-vm` (o desde el menú de aplicaciones), aparecen las notificaciones de inicio y sondeo del servicio RDP, pero FreeRDP finaliza de forma inmediata a los pocos segundos provocando el apagado automático del contenedor (*"Sesión cerrada. Deteniendo máquina virtual..."*).
->
-> **Líneas de investigación para la próxima sesión:**
-> 1. **Captura de logs de FreeRDP:** Desviar `stdout`/`stderr` de `xfreerdp3` hacia un archivo de log (`~/.local/state/windows-vm-rdp.log`) para identificar el código de error exacto (certificados, handshake CredSSP, timeout o fallo de renderizado Wayland).
-> 2. **Sondeo activo de RDP:** Verificar si el sondeo X.224 en el puerto 3389 recibe un ACK prematuro antes de que el subsistema de login (`winlogon`/`TermService`) esté listo para recibir autenticación.
-> 3. **Prueba en modo persistente:** Ejecutar `launch-windows-vm --keep-alive` y conectar manualmente con `xfreerdp3` para observar el comportamiento interactivo.
->
-> 📖 Documentación técnica completa y runbook: [`docs/windows-vm.md`](docs/windows-vm.md).
+* **Arranque y sondeo activo:** Espera automáticamente la disponibilidad del protocolo RDP (X.224) antes de conectar.
+* **Seguridad y compatibilidad:** Forzado de `/sec:tls /cert:ignore` para compatibilidad con la configuración de `dockurr/windows` (`UserAuthentication=0`).
+* **Diagnósticos integrados:** Registro persistente en `~/.local/state/windows-vm-rdp.log`.
+* **Modo persistente:** Admite `--keep-alive` (`-k`) para mantener la VM encendida al cerrar la ventana de FreeRDP.
+
+📖 Documentación técnica completa y runbook: [`docs/windows-vm.md`](docs/windows-vm.md).
 
 ---
 

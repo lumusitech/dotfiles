@@ -144,30 +144,72 @@ elif (( SCALE_PERCENT >= 130 )); then
   RDP_SCALE="/scale:140"
 fi
 
-# 6. Lanzar FreeRDP
+# 6. Preparar log y opciones de FreeRDP
+LOG_FILE="$HOME/.local/state/windows-vm-rdp.log"
+mkdir -p "$(dirname "$LOG_FILE")"
+
+RDP_OPTS=(
+  /u:"$WIN_USER"
+  /p:"$WIN_PASS"
+  /v:"$RDP_HOST:$RDP_PORT"
+  /sec:tls
+  /cert:ignore
+  /network:lan
+  -grab-keyboard
+  /sound
+  /microphone
+  /clipboard
+  /title:"Windows 11 - Omarchy"
+  /dynamic-resolution
+  /gfx:AVC444
+  /floatbar:sticky:off,default:visible,show:fullscreen
+)
+if [[ -n "$RDP_SCALE" ]]; then
+  RDP_OPTS+=("$RDP_SCALE")
+fi
+
 notify normal "Windows 11 VM" "Conectando sesión de escritorio remoto..."
 
+# Breve estabilización para asegurar que el servicio TermService acepte conexiones
+sleep 1
+
+echo "========================================================" >> "$LOG_FILE"
+echo "[$(date '+%Y-%m-%d %H:%M:%S')] Iniciando sesión FreeRDP..." >> "$LOG_FILE"
+echo "Usuario: $WIN_USER | Destino: $RDP_HOST:$RDP_PORT" >> "$LOG_FILE"
+echo "========================================================" >> "$LOG_FILE"
+
 START_TIME=$(date +%s)
-xfreerdp3 /u:"$WIN_USER" /p:"$WIN_PASS" /v:"$RDP_HOST:$RDP_PORT" \
-  -grab-keyboard /sound /microphone /clipboard /cert:ignore \
-  /title:"Windows 11 - Omarchy" /dynamic-resolution /gfx \
-  /floatbar:sticky:off,default:visible,show:fullscreen $RDP_SCALE || true
+RDP_EXIT_CODE=0
+xfreerdp3 "${RDP_OPTS[@]}" >> "$LOG_FILE" 2>&1 || RDP_EXIT_CODE=$?
 END_TIME=$(date +%s)
 DURATION=$(( END_TIME - START_TIME ))
 
-# 7. Ciclo de vida posterior
-# Si la conexión duró menos de 3 segundos y falló, reintentar una vez tras breve pausa
-if (( DURATION < 3 )); then
+echo "[$(date '+%Y-%m-%d %H:%M:%S')] Sesión FreeRDP finalizada con código: $RDP_EXIT_CODE (duración: ${DURATION}s)" >> "$LOG_FILE"
+
+# 7. Ciclo de vida posterior y manejo de reintentos
+# Si la conexión duró menos de 3 segundos o devolvió código de error, reintentar una vez tras breve pausa
+if (( DURATION < 3 || RDP_EXIT_CODE != 0 )); then
+  echo "[$(date '+%Y-%m-%d %H:%M:%S')] Reintentando conexión tras salida prematura..." >> "$LOG_FILE"
   sleep 2
   if wait_for_rdp; then
-    xfreerdp3 /u:"$WIN_USER" /p:"$WIN_PASS" /v:"$RDP_HOST:$RDP_PORT" \
-      -grab-keyboard /sound /microphone /clipboard /cert:ignore \
-      /title:"Windows 11 - Omarchy" /dynamic-resolution /gfx \
-      /floatbar:sticky:off,default:visible,show:fullscreen $RDP_SCALE || true
+    sleep 1
+    RDP_EXIT_CODE=0
+    xfreerdp3 "${RDP_OPTS[@]}" >> "$LOG_FILE" 2>&1 || RDP_EXIT_CODE=$?
+    echo "[$(date '+%Y-%m-%d %H:%M:%S')] Reintento finalizado con código: $RDP_EXIT_CODE" >> "$LOG_FILE"
   fi
+fi
+
+if (( RDP_EXIT_CODE != 0 )); then
+  notify critical "Windows 11 VM" "Error al conectar por RDP (código $RDP_EXIT_CODE). Consulta $LOG_FILE"
+  if [[ "$KEEP_ALIVE" != "true" ]]; then
+    stop_vm_container || true
+  fi
+  exit "$RDP_EXIT_CODE"
 fi
 
 if [[ "$KEEP_ALIVE" != "true" ]]; then
   notify low "Windows 11 VM" "Sesión cerrada. Deteniendo máquina virtual..."
   stop_vm_container || true
+else
+  notify low "Windows 11 VM" "Sesión cerrada. La máquina virtual permanece activa en segundo plano."
 fi
