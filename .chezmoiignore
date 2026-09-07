@@ -2,3 +2,5 @@ README.md
 .gitignore
 docs/**
 rclone.conf.example
+.local/share/applications/mimeinfo.cache
+

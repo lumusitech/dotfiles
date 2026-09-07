@@ -10,13 +10,17 @@
 
 set -euo pipefail
 
-CONTAINER="omarchy-windows"
+CONTAINER="${WINDOWS_CONTAINER_NAME:-windows-vm}"
+if ! docker inspect "$CONTAINER" >/dev/null 2>&1 && docker inspect "omarchy-windows" >/dev/null 2>&1; then
+  CONTAINER="omarchy-windows"
+fi
+
 RDP_HOST="127.0.0.1"
 RDP_PORT=3389
 CREDENTIALS_FILE="$HOME/.config/windows/credentials"
-COMPOSE_FILE="${OMARCHY_WINDOWS_DIR:-/var/lib/omarchy/windows}/docker-compose.yml"
-if [[ ! -f "$COMPOSE_FILE" && -f "$HOME/.config/windows/docker-compose.yml" ]]; then
-  COMPOSE_FILE="$HOME/.config/windows/docker-compose.yml"
+COMPOSE_FILE="$HOME/.config/windows/docker-compose.yml"
+if [[ ! -f "$COMPOSE_FILE" && -f "${OMARCHY_WINDOWS_DIR:-/var/lib/omarchy/windows}/docker-compose.yml" ]]; then
+  COMPOSE_FILE="${OMARCHY_WINDOWS_DIR:-/var/lib/omarchy/windows}/docker-compose.yml"
 fi
 TIMEOUT_SECONDS=60
 KEEP_ALIVE=false

@@ -4,8 +4,9 @@
 # ble.sh syntax highlighting & autosuggestions (si está instalado)
 [[ -f ~/.local/share/blesh/ble.sh ]] && source ~/.local/share/blesh/ble.sh --noattach
 
-. "$HOME/.local/share/../bin/env"
-. "$HOME/.cargo/env"
+# Variables de entorno de binarios y cargo (si existen)
+[[ -f "$HOME/.local/bin/env" ]] && . "$HOME/.local/bin/env"
+[[ -f "$HOME/.cargo/env" ]] && . "$HOME/.cargo/env"
 
 # pnpm
 export PNPM_HOME="/home/carludev/.local/share/pnpm"
@@ -14,9 +15,9 @@ case ":$PATH:" in
   *) export PATH="$PNPM_HOME/bin:$PATH" ;;
 esac
 # pnpm end
-#
-# # FZF keybindings y autocompletado
-eval "$(fzf --bash)"
+
+# FZF keybindings y autocompletado
+command -v fzf >/dev/null 2>&1 && eval "$(fzf --bash)"
 
 # Cargar aliases personalizados
 [[ -f ~/.bash_aliases ]] && source ~/.bash_aliases
@@ -44,5 +45,6 @@ export PATH="$PATH:/home/carludev/.lmstudio/bin"
 
 
 
-# Load Angular CLI autocompletion.
-source <(ng completion script)
+# Load Angular CLI autocompletion (si está instalado).
+command -v ng >/dev/null 2>&1 && source <(ng completion script)
+
