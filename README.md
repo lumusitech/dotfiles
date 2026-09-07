@@ -1,12 +1,12 @@
-# 🚀 Omarchy 4 Dotfiles & Workstation Configuration
+# 🚀 CachyOS & Arch Linux Dotfiles & Workstation Configuration
 
-Repositorio integral de configuración, dotfiles y utilitarios para **Omarchy 4** (Arch Linux con Hyprland y arquitectura modular en Lua), gestionado con **[Chezmoi](https://www.chezmoi.io/)**.
+Repositorio integral de configuración, dotfiles y utilitarios para **CachyOS** y **Arch Linux** con entorno **Hyprland**, gestionado con **[Chezmoi](https://www.chezmoi.io/)**.
 
 ---
 
 ## 🎙️ Stack de Voz e IA: Voxtype (Dictado ES & Traducción EN)
 
-Omarchy y Hyprland integran un sistema Push-to-Talk de dictado por voz ultrarrápido con modelos Whisper locales:
+Integración Push-to-Talk de dictado por voz ultrarrápido con modelos Whisper locales:
 
 * **Atajo `F9` (Dictado en Español):**
   * Invoca `voxtype record start` (al presionar) y `voxtype record stop` (al soltar).
@@ -24,32 +24,29 @@ Omarchy y Hyprland integran un sistema Push-to-Talk de dictado por voz ultrarrá
 
 ---
 
-## 🧭 ¿Qué incluye Omarchy 4 de serie vs. Qué debes instalar?
-
-### ✅ Ya incluido de fábrica en Omarchy 4 (NO necesitas instalarlo):
-* **Herramientas de sistema y atajos:** `omacalc` (calculadora oficial), `cliamp` (reproductor de música en terminal), `btop`, `fd`, `ripgrep`, `bat`, `docker`, `docker-compose`, `python-gobject`, `mpv`, `imv`, `lazygit`, `fastfetch`, `mise-bin`.
-* **Webapps base:** `Basecamp`, `HEY`, `Discord`, `Zoom`, `X`, `YouTube`, `WhatsApp`, `Google Maps`, `Google Messages`, `Google Photos`.
-
----
-
-### 📥 El Delta que SÍ debes instalar (Lo que no viene en la ISO):
+## 🧭 Paquetes Sugeridos e Instalación en CachyOS
 
 Todos los comandos son **100% idempotentes** gracias a la bandera `--needed`:
 
-#### 1. Almacenamiento, FUSE y Discos NTFS
+### 1. Sistema Base, Terminal y Herramientas (Pacman)
 ```bash
-sudo pacman -S --needed rclone fuse3 ntfs-3g
+sudo pacman -S --needed \
+  rclone fuse3 ntfs-3g \
+  btop fd ripgrep bat \
+  docker docker-compose \
+  mpv imv lazygit fastfetch eza socat freerdp libnotify foot jq
 ```
 
-#### 2. Dictado por Voz, Traducción Shell & AUR
+### 2. Paquetes AUR & Productividad (Paru)
 ```bash
-sudo pacman -S --needed translate-shell
-yay -S --needed voxtype-bin
-```
+paru -S --needed \
+  mise-bin \
+  voxtype-bin \
+  onlyoffice-bin \
+  ttf-ms-fonts ttf-vista-fonts ttf-aptos-fonts \
+  galculator \
+  translate-shell
 
-#### 3. Ofimática y Tipografías MS
-```bash
-yay -S --needed onlyoffice-bin ttf-ms-fonts ttf-vista-fonts ttf-aptos-fonts
 fc-cache -fv
 ```
 
@@ -61,33 +58,37 @@ Si reinstalas el sistema de cero:
 
 ```mermaid
 flowchart TD
-    A["1. Instalar Omarchy 4"] --> B["2. Configurar /etc/fstab y Discos NTFS"]
-    B --> C["3. Instalar Paquetes Faltantes (Delta)"]
+    A["1. Instalar CachyOS (Hyprland)"] --> B["2. Configurar /etc/fstab y Discos NTFS"]
+    B --> C["3. Instalar Paquetes Esenciales (Pacman + Paru)"]
     C --> D["4. Aplicar Dotfiles con Chezmoi"]
     D --> E["5. Restaurar rclone.conf y Disfrutar"]
 ```
 
 ### Paso 1: Sistema Base
-Instalar Omarchy 4 desde la ISO oficial y reiniciar.
+Instalar CachyOS desde la ISO oficial con la edición Hyprland (o base) y reiniciar.
 
 ### Paso 2: Discos Físicos (/etc/fstab)
-Configurar los montajes de discos NTFS en `/etc/fstab` (según `omarchy4-storage-workflow-runbook.md`):
+Configurar los montajes de discos NTFS en `/etc/fstab` (según [`docs/cachyos-setup-runbook.md`](docs/cachyos-setup-runbook.md)):
 ```bash
 sudo mkdir -p /mnt/DATOS-2TB /mnt/BACKUP-1TB /mnt/BACKUP-4TB
 sudo mount -a
 ```
 
-### Paso 3: Instalar únicamente el Delta
+### Paso 3: Instalar Paquetes
 ```bash
-sudo pacman -S --needed rclone fuse3 ntfs-3g translate-shell
-yay -S --needed voxtype-bin onlyoffice-bin ttf-ms-fonts ttf-vista-fonts ttf-aptos-fonts
+sudo pacman -S --needed rclone fuse3 ntfs-3g btop fd ripgrep bat docker docker-compose mpv imv lazygit fastfetch eza socat freerdp libnotify foot jq
+paru -S --needed mise-bin voxtype-bin onlyoffice-bin ttf-ms-fonts ttf-vista-fonts ttf-aptos-fonts galculator translate-shell
 fc-cache -fv
+
+# Habilitar servicio Docker e incorporar usuario al grupo
+sudo systemctl enable --now docker
+sudo usermod -aG docker $USER
 ```
 
 ### Paso 4: Desplegar Dotfiles con Chezmoi
 ```bash
-# 1. Instalar chezmoi (vía mise o pacman)
-mise use -g chezmoi || sudo pacman -S chezmoi
+# 1. Instalar chezmoi
+sudo pacman -S --needed chezmoi git
 
 # 2. Inicializar y aplicar todo tu entorno en 1 paso:
 chezmoi init --apply https://github.com/lumusitech/dotfiles.git

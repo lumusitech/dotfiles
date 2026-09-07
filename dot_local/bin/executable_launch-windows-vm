@@ -15,6 +15,9 @@ RDP_HOST="127.0.0.1"
 RDP_PORT=3389
 CREDENTIALS_FILE="$HOME/.config/windows/credentials"
 COMPOSE_FILE="${OMARCHY_WINDOWS_DIR:-/var/lib/omarchy/windows}/docker-compose.yml"
+if [[ ! -f "$COMPOSE_FILE" && -f "$HOME/.config/windows/docker-compose.yml" ]]; then
+  COMPOSE_FILE="$HOME/.config/windows/docker-compose.yml"
+fi
 TIMEOUT_SECONDS=60
 KEEP_ALIVE=false
 
@@ -39,19 +42,44 @@ notify() {
 }
 
 start_vm_container() {
-  (
-    set +u
-    source /usr/bin/omarchy-windows-vm "" >/dev/null 2>&1
-    priv up
-  )
+  if [[ -f /usr/bin/omarchy-windows-vm ]]; then
+    (
+      set +u
+      source /usr/bin/omarchy-windows-vm "" >/dev/null 2>&1
+      priv up
+    )
+  else
+    # CachyOS / Arch Linux nativo
+    local compose="$COMPOSE_FILE"
+    if [[ ! -f "$compose" && -f "$HOME/.config/windows/docker-compose.yml" ]]; then
+      compose="$HOME/.config/windows/docker-compose.yml"
+    fi
+    if [[ -f "$compose" ]]; then
+      docker compose -f "$compose" up -d
+    else
+      echo "No se encontró archivo docker-compose.yml en $compose ni en ~/.config/windows/" >&2
+      return 1
+    fi
+  fi
 }
 
 stop_vm_container() {
-  (
-    set +u
-    source /usr/bin/omarchy-windows-vm "" >/dev/null 2>&1
-    priv down
-  )
+  if [[ -f /usr/bin/omarchy-windows-vm ]]; then
+    (
+      set +u
+      source /usr/bin/omarchy-windows-vm "" >/dev/null 2>&1
+      priv down
+    )
+  else
+    # CachyOS / Arch Linux nativo
+    local compose="$COMPOSE_FILE"
+    if [[ ! -f "$compose" && -f "$HOME/.config/windows/docker-compose.yml" ]]; then
+      compose="$HOME/.config/windows/docker-compose.yml"
+    fi
+    if [[ -f "$compose" ]]; then
+      docker compose -f "$compose" down
+    fi
+  fi
 }
 
 # 1. Verificar si el contenedor está en ejecución
