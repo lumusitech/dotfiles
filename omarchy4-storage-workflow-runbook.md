@@ -141,11 +141,15 @@ sudo pacman -S --needed fontconfig
 fc-cache -r -v
 ```
 
-* **Omarchy 4 - Windows VM (Permisos 700 y eliminación de bit setgid):**
-Omarchy 4 implementa aislamiento de monturas en `/var/lib/omarchy/windows/mounts/users/<uid>/` y valida estrictamente que `~/.windows` y `~/Windows` tengan permisos `700`. Si `~/Windows` posee el bit `setgid` activo (`2700`, común en carpetas compartidas/Samba), el pre-vuelo de monturas falla silenciosamente y bloquea tanto el inicio (`launch`) como la desinstalación (`remove`).
+* **Omarchy 4 - Windows VM (Permisos 700, bit setgid y prevención Samba):**
+Omarchy 4 implementa aislamiento de monturas en `/var/lib/omarchy/windows/mounts/users/<uid>/` y valida estrictamente que `~/.windows` y `~/Windows` tengan permisos `700`.
+Si `~/Windows` está vacío, el contenedor Docker (`dockurr/windows` vía `/run/samba.sh`) le aplica `chmod 2777` activando el bit `setgid` (`2700`/`drwx--S---`). El script de arranque `omarchy-windows-vm` intenta corregirlo internamente con `chmod 0700`, pero GNU coreutils no remueve bits especiales con esa sintaxis, haciendo que el pre-vuelo falle y bloquee tanto el inicio (`launch`) como la desinstalación (`remove`).
 ```bash
-# Limpiar el bit setgid (00700) y forzar permisos 700
+# 1. Limpiar el bit setgid (00700) y forzar permisos 700
 chmod 00700 ~/Windows ~/.windows
+
+# 2. Inmunizar ~/Windows con un marcador para evitar que Samba vuelva a aplicar chmod 2777
+touch ~/Windows/.keep
 ```
 
 * **Suspensión Profunda / Prevención de Despertar Instantáneo (Instant Wake):**
