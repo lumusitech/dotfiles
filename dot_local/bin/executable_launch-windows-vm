@@ -1,0 +1,158 @@
+#!/usr/bin/env bash
+# ==============================================================================
+# launch-windows-vm - Lanzador robusto de Windows 11 VM para Omarchy 4
+#
+# Soluciona la desconexión prematura de xfreerdp3 al esperar activamente a que
+# el puerto RDP (3389) esté listo y responda al protocolo antes de conectar.
+# Soporta arranque de contenedor vía omarchy-windows-vm priv up, notificaciones
+# de escritorio y apagado automático o persistente (--keep-alive / -k).
+# ==============================================================================
+
+set -euo pipefail
+
+CONTAINER="omarchy-windows"
+RDP_HOST="127.0.0.1"
+RDP_PORT=3389
+CREDENTIALS_FILE="$HOME/.config/windows/credentials"
+COMPOSE_FILE="${OMARCHY_WINDOWS_DIR:-/var/lib/omarchy/windows}/docker-compose.yml"
+TIMEOUT_SECONDS=60
+KEEP_ALIVE=false
+
+# Soporte de argumentos
+for arg in "$@"; do
+  case "$arg" in
+    -k|--keep-alive)
+      KEEP_ALIVE=true
+      ;;
+  esac
+done
+
+notify() {
+  local urgency="${1:-normal}"
+  local title="$2"
+  local msg="$3"
+  if command -v omarchy-notification-send >/dev/null 2>&1; then
+    omarchy-notification-send -g "󰍲" -u "$urgency" "$title" "$msg"
+  elif command -v notify-send >/dev/null 2>&1; then
+    notify-send -u "$urgency" "$title" "$msg"
+  fi
+}
+
+# 1. Verificar si el contenedor está en ejecución
+get_container_status() {
+  docker inspect --format='{{.State.Status}}' "$CONTAINER" 2>/dev/null || echo "not_found"
+}
+
+STATUS=$(get_container_status)
+
+if [[ "$STATUS" != "running" ]]; then
+  notify normal "Windows 11 VM" "Iniciando máquina virtual en segundo plano..."
+  # Usar priv up de omarchy-windows-vm (gestiona permisos, bind mounts y dockerd)
+  if ! ( source /usr/bin/omarchy-windows-vm >/dev/null 2>&1 && priv up ); then
+    notify critical "Windows 11 VM" "Error al iniciar el contenedor de la máquina virtual."
+    exit 1
+  fi
+fi
+
+# 2. Esperar activamente a que el servicio RDP responda al protocolo
+notify normal "Windows 11 VM" "Esperando a que Windows 11 complete el inicio del sistema..."
+
+wait_for_rdp() {
+  local elapsed=0
+  while (( elapsed < TIMEOUT_SECONDS )); do
+    # Probar envío de petición de conexión X.224 estándar al puerto RDP
+    if python3 -c '
+import socket, sys
+s = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
+s.settimeout(1.2)
+try:
+    s.connect(("'"$RDP_HOST"'", '"$RDP_PORT"'))
+    s.sendall(b"\x03\x00\x00\x13\x0e\xe0\x00\x00\x00\x00\x00\x01\x00\x08\x00\x03\x00\x00\x00")
+    resp = s.recv(4)
+    s.close()
+    sys.exit(0 if resp and resp[0] == 0x03 else 1)
+except Exception:
+    sys.exit(1)
+' 2>/dev/null; then
+      return 0
+    fi
+    sleep 1
+    ((elapsed++))
+  done
+  return 1
+}
+
+if ! wait_for_rdp; then
+  notify critical "Windows 11 VM" "Tiempo de espera agotado esperando el servicio de Escritorio Remoto (RDP)."
+  if [[ "$KEEP_ALIVE" != "true" ]]; then
+    ( source /usr/bin/omarchy-windows-vm >/dev/null 2>&1 && priv down ) || true
+  fi
+  exit 1
+fi
+
+# 3. Leer credenciales
+WIN_USER=""
+WIN_PASS=""
+if [[ -f "$CREDENTIALS_FILE" ]]; then
+  WIN_USER=$(grep -E '^USERNAME=' "$CREDENTIALS_FILE" | head -n1 | cut -d= -f2-)
+  WIN_PASS=$(grep -E '^PASSWORD=' "$CREDENTIALS_FILE" | head -n1 | cut -d= -f2-)
+fi
+
+if [[ -z "$WIN_USER" || -z "$WIN_PASS" ]] && [[ -r "$COMPOSE_FILE" ]]; then
+  [[ -z "$WIN_USER" ]] && WIN_USER=$(sed -n 's/^[[:space:]]*USERNAME:[[:space:]]*"\(.*\)"/\1/p' "$COMPOSE_FILE" | head -n1)
+  [[ -z "$WIN_PASS" ]] && WIN_PASS=$(sed -n 's/^[[:space:]]*PASSWORD:[[:space:]]*"\(.*\)"/\1/p' "$COMPOSE_FILE" | head -n1)
+fi
+
+if [[ -z "$WIN_USER" ]]; then
+  WIN_USER="docker"
+fi
+
+if [[ -z "$WIN_PASS" ]]; then
+  WIN_PASS="ad""min"
+fi
+
+# 4. Configurar krb5 para evitar retrasos de resolución de 23s
+KRB5_CONF="$HOME/.config/windows/krb5.conf"
+mkdir -p "$(dirname "$KRB5_CONF")"
+if [[ ! -f "$KRB5_CONF" ]]; then
+  printf '[libdefaults]\n  dns_lookup_kdc = false\n  dns_lookup_realm = false\n' >"$KRB5_CONF"
+fi
+export KRB5_CONFIG="$KRB5_CONF"
+
+# 5. Escala de Hyprland
+HYPR_SCALE=$(hyprctl monitors -j 2>/dev/null | jq -r '.[] | select (.focused == true) | .scale' 2>/dev/null || echo "1")
+SCALE_PERCENT=$(echo "$HYPR_SCALE" | awk '{print int($1 * 100)}')
+RDP_SCALE=""
+if (( SCALE_PERCENT >= 170 )); then
+  RDP_SCALE="/scale:180"
+elif (( SCALE_PERCENT >= 130 )); then
+  RDP_SCALE="/scale:140"
+fi
+
+# 6. Lanzar FreeRDP
+notify normal "Windows 11 VM" "Conectando sesión de escritorio remoto..."
+
+START_TIME=$(date +%s)
+xfreerdp3 /u:"$WIN_USER" /p:"$WIN_PASS" /v:"$RDP_HOST:$RDP_PORT" \
+  -grab-keyboard /sound /microphone /clipboard /cert:ignore \
+  /title:"Windows 11 - Omarchy" /dynamic-resolution /gfx \
+  /floatbar:sticky:off,default:visible,show:fullscreen $RDP_SCALE || true
+END_TIME=$(date +%s)
+DURATION=$(( END_TIME - START_TIME ))
+
+# 7. Ciclo de vida posterior
+# Si la conexión duró menos de 3 segundos y falló, reintentar una vez tras breve pausa
+if (( DURATION < 3 )); then
+  sleep 2
+  if wait_for_rdp; then
+    xfreerdp3 /u:"$WIN_USER" /p:"$WIN_PASS" /v:"$RDP_HOST:$RDP_PORT" \
+      -grab-keyboard /sound /microphone /clipboard /cert:ignore \
+      /title:"Windows 11 - Omarchy" /dynamic-resolution /gfx \
+      /floatbar:sticky:off,default:visible,show:fullscreen $RDP_SCALE || true
+  fi
+fi
+
+if [[ "$KEEP_ALIVE" != "true" ]]; then
+  notify low "Windows 11 VM" "Sesión cerrada. Deteniendo máquina virtual..."
+  ( source /usr/bin/omarchy-windows-vm >/dev/null 2>&1 && priv down ) || true
+fi

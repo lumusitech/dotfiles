@@ -32,6 +32,7 @@ El proceso toma solo unos segundos y no instala servicios en segundo plano ni al
 
 ---
 
-## 🔗 Referencias Oficiales
+## 🔗 Referencias Oficiales y Documentación
+* [Guía de Arquitectura y Lanzador de Windows VM en Omarchy](windows-vm.md)
 * **Repositorio en GitHub:** [https://github.com/massgravel/Microsoft-Activation-Scripts](https://github.com/massgravel/Microsoft-Activation-Scripts)
 * **Sitio y documentación oficial:** [https://massgrave.dev](https://massgrave.dev)
