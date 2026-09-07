@@ -42,6 +42,10 @@ Se implementó el script wrapper [`launch-windows-vm`](file:///home/carludev/.lo
 * **Manejo resiliente de permisos:** Sincroniza con las rutinas de seguridad de `omarchy-windows-vm` para montar unidades y pedir autorización Polkit solo cuando sea estrictamente necesario tras un reinicio.
 * **Configuración Kerberos protegida:** Exporta automáticamente la configuración de `krb5.conf` con `dns_lookup_kdc = false` para evitar bloqueos de 23 segundos al conectar.
 * **Escalado HiDPI dinámico:** Lee la escala activa del monitor actual en Hyprland (`hyprctl monitors -j`) y ajusta `/scale:140` o `/scale:180` si corresponde.
+* **Compatibilidad de seguridad TLS (`/sec:tls /cert:ignore`):** La instalación desatendida de `dockurr/windows` desactiva NLA (`<UserAuthentication>0</UserAuthentication>`), por lo que FreeRDP 3 se configura explícitamente en modo TLS con bypass de certificados autofirmados.
+* **Optimización LAN (`/network:lan`):** Habilita la optimización de latencia y caché para la conexión local en loopback.
+* **Registro persistente de diagnóstico:** Desvía toda la salida y errores de FreeRDP a `~/.local/state/windows-vm-rdp.log` con marcas de tiempo y captura del código de salida `$RDP_EXIT_CODE`.
+* **Diferenciación de errores:** Notifica fallos de conexión explícitamente en lugar de asumir que la sesión se cerró normalmente por el usuario.
 * **Ciclo de vida limpio:** Si la sesión termina normalmente, detiene el contenedor para ahorrar recursos de CPU y RAM. Si se desea mantener la VM encendida en segundo plano, admite el parámetro `-k` o `--keep-alive`.
 
 ---
@@ -62,6 +66,9 @@ launch-windows-vm
 # Iniciar y conectar manteniendo la VM encendida al salir de FreeRDP
 launch-windows-vm --keep-alive
 
+# Ver registro de conexión y diagnósticos
+tail -f ~/.local/state/windows-vm-rdp.log
+
 # Consultar estado del contenedor
 omarchy-windows-vm status
 
@@ -71,25 +78,17 @@ omarchy-windows-vm stop
 
 ---
 
-## 🐛 Bug Report y Estado Actual (Pendiente de Resolución)
+## 🛠️ Resolución de Problemas: Diagnóstico del Cierre Prematuro
 
-### Comportamiento observado:
-Al invocar `launch-windows-vm` (tanto desde Walker/menú de apps como desde terminal):
-1. Se emiten las notificaciones de inicio y preparación:
-   * *"Iniciando máquina virtual en segundo plano..."*
-   * *"Esperando a que Windows 11 complete el inicio del sistema..."*
-2. A los pocos segundos, sin llegar a renderizarse la ventana interactiva de `xfreerdp3`, se dispara la notificación:
-   * *"Sesión cerrada. Deteniendo máquina virtual..."*
-3. Como `KEEP_ALIVE=false` por defecto, el script interpreta el cierre inmediato de FreeRDP como el fin de la sesión del usuario y ejecuta `stop_vm_container` (`priv down`), apagando la VM.
+### Causa Raíz Identificada:
+1. **Rechazo de NLA (CredSSP):** La imagen `dockurr/windows` configura Windows 11 con `<UserAuthentication>0</UserAuthentication>`, lo que deshabilita NLA a nivel de sistema operativo invitado. `xfreerdp3` negocia NLA por defecto si no se le instruye lo contrario, resultando en un aborto inmediato de la conexión antes de renderizar la ventana.
+2. **Pérdida de diagnósticos:** La ausencia de redirección a log en el lanzador gráfico enmascaraba el código de retorno de FreeRDP, haciendo que el script interpretara cualquier terminación como un cierre voluntario del usuario.
 
-### Diagnóstico preliminar e hipótesis:
-* **Cierre prematuro del proceso `xfreerdp3`:** El cliente RDP puede estar cerrándose inmediatamente debido a validación de certificados TLS (`/cert:ignore`), parámetros incompatibles en modo pantalla completa sobre Wayland/Hyprland, o credenciales rechazadas.
-* **Falso positivo de disponibilidad RDP:** Es posible que el sondeo X.224 en el puerto `127.0.0.1:3389` reciba una respuesta a nivel de socket antes de que el servicio `TermService` de Windows esté listo para iniciar la sesión gráfica de usuario.
-
-### Hoja de ruta para resolver (Mañana):
-- [ ] Desviar salida estándar y errores de FreeRDP a log permanente: `~/.local/state/windows-vm-rdp.log`.
-- [ ] Ejecutar la VM con persistencia (`launch-windows-vm --keep-alive`) y probar la invocación directa y aislada de `xfreerdp3` en una terminal con `/log-level:DEBUG`.
-- [ ] Ajustar flags de compatibilidad en FreeRDP (`/network:lan`, `/gfx`, etc.) o forzar backend X11/Wayland según convenga.
+### Correcciones Aplicadas en `launch-windows-vm`:
+* Forzado de protocolo `/sec:tls` junto con `/cert:ignore` y `/network:lan`.
+* Breve pausa de estabilización (1s) tras la confirmación de socket X.224 para permitir que `TermService` termine de alistar sus hilos de atención.
+* Redirección continua a `~/.local/state/windows-vm-rdp.log` registrando inicio, duración y código de salida exacto.
+* Notificación crítica descriptiva si `$RDP_EXIT_CODE != 0`.
 
 ---
 
