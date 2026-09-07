@@ -2,7 +2,7 @@
 Version=1.0
 Name=Google Keep
 Comment=Google Keep
-Exec=omarchy-launch-webapp "https://keep.google.com/u/0/"
+Exec=launch-webapp "https://keep.google.com/u/0/"
 Terminal=false
 Type=Application
 Icon=google-keep

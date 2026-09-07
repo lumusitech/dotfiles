@@ -2,7 +2,7 @@
 Version=1.0
 Name=Google Tasks
 Comment=Google Tasks
-Exec=omarchy-launch-webapp "https://tasks.google.com/tasks/?utm_source=OGB&utm_medium=app"
+Exec=launch-webapp "https://tasks.google.com/tasks/?utm_source=OGB&utm_medium=app"
 Terminal=false
 Type=Application
 Icon=google-tasks

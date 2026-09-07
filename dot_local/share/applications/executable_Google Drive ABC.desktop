@@ -2,7 +2,7 @@
 Version=1.0
 Name=Google Drive ABC
 Comment=Google Drive ABC
-Exec=omarchy-launch-webapp "https://drive.google.com/drive/u/1/my-drive"
+Exec=launch-webapp "https://drive.google.com/drive/u/1/my-drive"
 Terminal=false
 Type=Application
 Icon=google-drive-abc
