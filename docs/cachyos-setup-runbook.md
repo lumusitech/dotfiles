@@ -16,14 +16,28 @@ Guía completa de aprovisionamiento, migración y configuración de workstation 
 
 Todos los comandos son **100% idempotentes** gracias a la bandera `--needed`.
 
-### 1. Sistema, Terminal y Utilidades (Pacman)
+### 1. Sistema, Terminal y Stack Neovim / LazyVim (Pacman)
 ```bash
 sudo pacman -S --needed \
   rclone fuse3 ntfs-3g \
-  btop fd ripgrep bat \
+  neovim gcc make tree-sitter-cli \
+  ripgrep fd fzf bat btop \
+  git lazygit wl-clipboard \
+  unzip tar curl wget jq \
   docker docker-compose \
-  mpv imv lazygit fastfetch eza socat freerdp libnotify foot jq
+  mpv imv fastfetch eza socat freerdp libnotify foot \
+  ttf-jetbrains-mono-nerd chezmoi
 ```
+
+> **Dependencias de LazyVim incluidas:**
+> * `neovim`: Editor base (v0.10+).
+> * `gcc`, `make`, `tree-sitter-cli`: Compiladores requeridos por `nvim-treesitter` para compilar parsers de sintaxis.
+> * `ripgrep`, `fd`, `fzf`: Motor de búsqueda para Snacks / Telescope / Fzf-lua.
+> * `lazygit`: Integración Git flotante en Neovim (`<leader>gg`).
+> * `wl-clipboard`: Portapapeles sincronizado nativamente con Wayland/Hyprland (`+` y `*`).
+> * `unzip`, `tar`, `curl`, `wget`: Herramientas requeridas por `Mason` (`:Mason`) para descargar y descomprimir LSPs, formateadores y linters.
+> * `ttf-jetbrains-mono-nerd`: Iconos y glyphs para Neo-tree, Lualine, Bufferline y diagnósticos.
+> * `node`, `python`, `go`: Gestionados y actualizados automáticamente vía `mise`.
 
 ### 2. Paquetes AUR & Productividad (Paru)
 ```bash
