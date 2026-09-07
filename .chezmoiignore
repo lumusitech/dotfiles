@@ -3,4 +3,6 @@ README.md
 docs/**
 rclone.conf.example
 .local/share/applications/mimeinfo.cache
+setup-cachyos.sh
+
 

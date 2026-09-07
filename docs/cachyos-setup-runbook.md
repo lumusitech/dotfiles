@@ -14,38 +14,40 @@ Guía completa de aprovisionamiento, migración y configuración de workstation 
 
 ## 📦 Fase 1: Paquetes y Herramientas Esenciales
 
-Todos los comandos son **100% idempotentes** gracias a la bandera `--needed`.
+Puedes ejecutar el script de aprovisionamiento automatizado e idempotente:
+```bash
+bash setup-cachyos.sh
+```
 
-### 1. Sistema, Terminal y Stack Neovim / LazyVim (Pacman)
+O realizar la instalación manual paso a paso:
+
+### 1. Gestor AUR (Paru)
+En las versiones recientes de CachyOS, `paru` no viene preinstalado por defecto en favor de Shelly. Instálalo directamente desde los repositorios oficiales de CachyOS:
+```bash
+sudo pacman -S --needed paru
+```
+
+### 2. Sistema, Terminal y Stack Neovim / LazyVim (Pacman)
 ```bash
 sudo pacman -S --needed \
   rclone fuse3 ntfs-3g \
   neovim gcc make tree-sitter-cli \
   ripgrep fd fzf bat btop \
-  git lazygit wl-clipboard \
+  git lazygit \
   unzip tar curl wget jq \
   docker docker-compose \
-  mpv imv fastfetch eza socat freerdp libnotify foot \
+  mpv imv fastfetch eza socat foot \
   ttf-jetbrains-mono-nerd chezmoi
 ```
 
-> **Dependencias de LazyVim incluidas:**
-> * `neovim`: Editor base (v0.10+).
-> * `gcc`, `make`, `tree-sitter-cli`: Compiladores requeridos por `nvim-treesitter` para compilar parsers de sintaxis.
-> * `ripgrep`, `fd`, `fzf`: Motor de búsqueda para Snacks / Telescope / Fzf-lua.
-> * `lazygit`: Integración Git flotante en Neovim (`<leader>gg`).
-> * `wl-clipboard`: Portapapeles sincronizado nativamente con Wayland/Hyprland (`+` y `*`).
-> * `unzip`, `tar`, `curl`, `wget`: Herramientas requeridas por `Mason` (`:Mason`) para descargar y descomprimir LSPs, formateadores y linters.
-> * `ttf-jetbrains-mono-nerd`: Iconos y glyphs para Neo-tree, Lualine, Bufferline y diagnósticos.
-> * `node`, `python`, `go`: Gestionados y actualizados automáticamente vía `mise`.
+> **Nota:** Herramientas como `wl-clipboard` y `libnotify` ya vienen preinstaladas por el paquete base de CachyOS (`cachyos-hyprland-settings`).
 
-### 2. Paquetes AUR & Productividad (Paru)
+### 3. Paquetes AUR & Productividad (Paru)
 ```bash
 paru -S --needed \
   mise-bin \
   voxtype-bin \
   onlyoffice-bin \
-  ttf-ms-fonts ttf-vista-fonts ttf-aptos-fonts \
   galculator \
   translate-shell
 

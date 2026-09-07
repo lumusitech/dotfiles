@@ -28,26 +28,37 @@ Integración Push-to-Talk de dictado por voz ultrarrápido con modelos Whisper l
 
 Todos los comandos son **100% idempotentes** gracias a la bandera `--needed`:
 
-### 1. Sistema Base, Terminal y Stack Neovim / LazyVim (Pacman)
+Puedes ejecutar el script automatizado e idempotente:
+```bash
+bash setup-cachyos.sh
+```
+
+O instalar paso a paso:
+
+### 1. Gestor AUR (Paru)
+```bash
+sudo pacman -S --needed paru
+```
+
+### 2. Sistema Base, Terminal y Stack Neovim / LazyVim (Pacman)
 ```bash
 sudo pacman -S --needed \
   rclone fuse3 ntfs-3g \
   neovim gcc make tree-sitter-cli \
   ripgrep fd fzf bat btop \
-  git lazygit wl-clipboard \
+  git lazygit \
   unzip tar curl wget jq \
   docker docker-compose \
-  mpv imv fastfetch eza socat freerdp libnotify foot \
+  mpv imv fastfetch eza socat foot \
   ttf-jetbrains-mono-nerd chezmoi
 ```
 
-### 2. Paquetes AUR & Productividad (Paru)
+### 3. Paquetes AUR & Productividad (Paru)
 ```bash
 paru -S --needed \
   mise-bin \
   voxtype-bin \
   onlyoffice-bin \
-  ttf-ms-fonts ttf-vista-fonts ttf-aptos-fonts \
   galculator \
   translate-shell
 
@@ -78,26 +89,36 @@ sudo mkdir -p /mnt/DATOS-2TB /mnt/BACKUP-1TB /mnt/BACKUP-4TB
 sudo mount -a
 ```
 
-### Paso 3: Instalar Paquetes
+### Paso 3: Instalar Paquetes y Configuración
+Puedes ejecutar el script automatizado:
 ```bash
+bash setup-cachyos.sh
+```
+
+O de forma manual:
+```bash
+# 1. Asegurar Paru
+sudo pacman -S --needed paru
+
+# 2. Sistema y desarrollo
 sudo pacman -S --needed \
   rclone fuse3 ntfs-3g \
   neovim gcc make tree-sitter-cli \
   ripgrep fd fzf bat btop \
-  git lazygit wl-clipboard \
+  git lazygit \
   unzip tar curl wget jq \
   docker docker-compose \
-  mpv imv fastfetch eza socat freerdp libnotify foot \
+  mpv imv fastfetch eza socat foot \
   ttf-jetbrains-mono-nerd chezmoi
 
+# 3. AUR (Voxtype, Mise, OnlyOffice, Galculator)
 paru -S --needed \
   mise-bin voxtype-bin onlyoffice-bin \
-  ttf-ms-fonts ttf-vista-fonts ttf-aptos-fonts \
   galculator translate-shell
 
 fc-cache -fv
 
-# Habilitar servicio Docker e incorporar usuario al grupo
+# 4. Habilitar servicio Docker e incorporar usuario al grupo
 sudo systemctl enable --now docker
 sudo usermod -aG docker $USER
 ```
