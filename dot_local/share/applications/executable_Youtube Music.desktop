@@ -2,7 +2,7 @@
 Version=1.0
 Name=Youtube Music
 Comment=Youtube Music
-Exec=launch-webapp "https://music.youtube.com/"
+Exec=omarchy-launch-webapp "https://music.youtube.com/"
 Terminal=false
 Type=Application
 Icon=youtube-music

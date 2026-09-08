@@ -2,7 +2,7 @@
 Version=1.0
 Name=Devtalles
 Comment=Devtalles
-Exec=launch-webapp "https://cursos.devtalles.com/enrollments"
+Exec=omarchy-launch-webapp "https://cursos.devtalles.com/enrollments"
 Terminal=false
 Type=Application
 Icon=devtalles

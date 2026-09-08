@@ -1,9 +1,9 @@
 #!/usr/bin/env bash
 if hyprctl clients | grep -B 15 "class: chrome-music.youtube.com__-Default" | grep -q "workspace:.*special:music"; then
-    hyprctl dispatch togglespecialworkspace music
+    hyprctl dispatch 'hl.dsp.workspace.toggle_special("music")'
 else
     if ! hyprctl monitors | grep -q "special:music"; then
-        hyprctl dispatch togglespecialworkspace music
+        hyprctl dispatch 'hl.dsp.workspace.toggle_special("music")'
     fi
-    hyprctl dispatch exec "$HOME/.local/bin/launch-webapp https://music.youtube.com/"
+    hyprctl dispatch 'hl.dsp.exec_cmd("omarchy-launch-webapp https://music.youtube.com/")'
 fi

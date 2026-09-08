@@ -2,7 +2,7 @@
 Version=1.0
 Name=Google Gemini
 Comment=Google Gemini
-Exec=launch-webapp "https://gemini.google.com/app?utm_source=app_launcher&utm_medium=owned&utm_campaign=base_all&hl=es_419"
+Exec=omarchy-launch-webapp "https://gemini.google.com/app?utm_source=app_launcher&utm_medium=owned&utm_campaign=base_all&hl=es_419"
 Terminal=false
 Type=Application
 Icon=google-gemini

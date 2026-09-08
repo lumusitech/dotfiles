@@ -1,22 +1,9 @@
 #!/usr/bin/env bash
-# ==============================================================================
-# toggle-calc - Toggle para la calculadora nativa en special workspace:calc
-# Compatible con CachyOS, Arch Linux y Hyprland
-# ==============================================================================
-
-if hyprctl clients | grep -B 15 -iE "(class:.*(calc|qalculate)|title:.*(calc|qalculate))" | grep -q "workspace:.*special:calc"; then
-    hyprctl dispatch togglespecialworkspace calc
+if hyprctl clients | grep -B 15 -iE "(class:.*omacalc|title:.*omacalc)" | grep -q "workspace:.*special:calc"; then
+    hyprctl dispatch 'hl.dsp.workspace.toggle_special("calc")'
 else
     if ! hyprctl monitors | grep -q "special:calc"; then
-        hyprctl dispatch togglespecialworkspace calc
+        hyprctl dispatch 'hl.dsp.workspace.toggle_special("calc")'
     fi
-    CALC_CMD="kcalc"
-    for c in kcalc qalculate-gtk qalculate-qt gnome-calculator galculator; do
-        if command -v "$c" >/dev/null 2>&1; then
-            CALC_CMD="$c"
-            break
-        fi
-    done
-    hyprctl dispatch exec "$CALC_CMD"
+    hyprctl dispatch 'hl.dsp.exec_cmd("omacalc")'
 fi
-

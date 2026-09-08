@@ -5,10 +5,9 @@ if [[ -f "$TARGET" ]]; then
   # Extrae la URL de redirección del archivo .link.html
   URL=$(grep -oP 'https://docs\.google\.com/[^"'\'' ]+' "$TARGET" | head -n 1)
   if [[ -n "$URL" ]]; then
-    exec launch-webapp "$URL"
+    exec omarchy-launch-webapp "$URL"
   fi
 fi
 
 # Fallback por si se invoca sin archivo o es una URL directa
-exec launch-webapp "${TARGET:-https://sheets.google.com}"
-
+exec omarchy-launch-webapp "${TARGET:-https://sheets.google.com}"

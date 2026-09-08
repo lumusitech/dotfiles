@@ -2,7 +2,7 @@
 Version=1.0
 Name=Microsoft Onedrive
 Comment=Microsoft Onedrive
-Exec=launch-webapp "https://onedrive.live.com/my"
+Exec=omarchy-launch-webapp "https://onedrive.live.com/my"
 Terminal=false
 Type=Application
 Icon=microsoft-onedrive
