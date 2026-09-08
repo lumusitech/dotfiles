@@ -1,12 +1,12 @@
-# 🚀 CachyOS & Arch Linux Dotfiles & Workstation Configuration
+# 🚀 Omarchy 4 Dotfiles & Workstation Configuration
 
-Repositorio integral de configuración, dotfiles y utilitarios para **CachyOS** y **Arch Linux** con entorno **Hyprland**, gestionado con **[Chezmoi](https://www.chezmoi.io/)**.
+Repositorio integral de configuración, dotfiles y utilitarios para **Omarchy 4** (Arch Linux con Hyprland y arquitectura modular en Lua), gestionado con **[Chezmoi](https://www.chezmoi.io/)**.
 
 ---
 
 ## 🎙️ Stack de Voz e IA: Voxtype (Dictado ES & Traducción EN)
 
-Integración Push-to-Talk de dictado por voz ultrarrápido con modelos Whisper locales:
+Omarchy y Hyprland integran un sistema Push-to-Talk de dictado por voz ultrarrápido con modelos Whisper locales:
 
 * **Atajo `F9` (Dictado en Español):**
   * Invoca `voxtype record start` (al presionar) y `voxtype record stop` (al soltar).
@@ -24,44 +24,32 @@ Integración Push-to-Talk de dictado por voz ultrarrápido con modelos Whisper l
 
 ---
 
-## 🧭 Paquetes Sugeridos e Instalación en CachyOS
+## 🧭 ¿Qué incluye Omarchy 4 de serie vs. Qué debes instalar?
+
+### ✅ Ya incluido de fábrica en Omarchy 4 (NO necesitas instalarlo):
+* **Herramientas de sistema y atajos:** `omacalc` (calculadora oficial), `cliamp` (reproductor de música en terminal), `btop`, `fd`, `ripgrep`, `bat`, `docker`, `docker-compose`, `python-gobject`, `mpv`, `imv`, `lazygit`, `fastfetch`, `mise-bin`.
+* **Webapps base:** `Basecamp`, `HEY`, `Discord`, `Zoom`, `X`, `YouTube`, `WhatsApp`, `Google Maps`, `Google Messages`, `Google Photos`.
+
+---
+
+### 📥 El Delta que SÍ debes instalar (Lo que no viene en la ISO):
 
 Todos los comandos son **100% idempotentes** gracias a la bandera `--needed`:
 
-Puedes ejecutar el script automatizado e idempotente:
+#### 1. Almacenamiento, FUSE y Discos NTFS
 ```bash
-bash setup-cachyos.sh
+sudo pacman -S --needed rclone fuse3 ntfs-3g
 ```
 
-O instalar paso a paso:
-
-### 1. Gestor AUR (Paru)
+#### 2. Dictado por Voz, Traducción Shell & AUR
 ```bash
-sudo pacman -S --needed paru
+sudo pacman -S --needed translate-shell
+yay -S --needed voxtype-bin
 ```
 
-### 2. Sistema Base, Terminal y Stack Neovim / LazyVim (Pacman)
+#### 3. Ofimática y Tipografías MS
 ```bash
-sudo pacman -S --needed \
-  rclone fuse3 ntfs-3g \
-  neovim gcc make tree-sitter-cli \
-  ripgrep fd fzf bat btop \
-  git lazygit \
-  unzip tar curl wget jq \
-  docker docker-compose \
-  mpv imv fastfetch eza socat foot \
-  ttf-jetbrains-mono-nerd chezmoi
-```
-
-### 3. Paquetes AUR & Productividad (Paru)
-```bash
-paru -S --needed \
-  mise-bin \
-  voxtype-bin \
-  onlyoffice-bin \
-  galculator \
-  translate-shell
-
+yay -S --needed onlyoffice-bin ttf-ms-fonts ttf-vista-fonts ttf-aptos-fonts
 fc-cache -fv
 ```
 
@@ -73,60 +61,37 @@ Si reinstalas el sistema de cero:
 
 ```mermaid
 flowchart TD
-    A["1. Instalar CachyOS (Hyprland)"] --> B["2. Configurar /etc/fstab y Discos NTFS"]
-    B --> C["3. Instalar Paquetes Esenciales (Pacman + Paru)"]
+    A["1. Instalar Omarchy 4"] --> B["2. Configurar /etc/fstab y Discos NTFS"]
+    B --> C["3. Instalar Paquetes Faltantes (Delta)"]
     C --> D["4. Aplicar Dotfiles con Chezmoi"]
     D --> E["5. Restaurar rclone.conf y Disfrutar"]
 ```
 
 ### Paso 1: Sistema Base
-Instalar CachyOS desde la ISO oficial con la edición Hyprland (o base) y reiniciar.
+Instalar Omarchy 4 desde la ISO oficial y reiniciar.
 
 ### Paso 2: Discos Físicos (/etc/fstab)
-Configurar los montajes de discos NTFS en `/etc/fstab` (según [`docs/cachyos-setup-runbook.md`](docs/cachyos-setup-runbook.md)):
+Configurar los montajes de discos NTFS en `/etc/fstab` (según `omarchy4-storage-workflow-runbook.md`):
 ```bash
 sudo mkdir -p /mnt/DATOS-2TB /mnt/BACKUP-1TB /mnt/BACKUP-4TB
 sudo mount -a
 ```
 
-### Paso 3: Instalar Paquetes y Configuración
-Puedes ejecutar el script automatizado:
+### Paso 3: Instalar únicamente el Delta y habilitar Docker
 ```bash
-bash setup-cachyos.sh
-```
-
-O de forma manual:
-```bash
-# 1. Asegurar Paru
-sudo pacman -S --needed paru
-
-# 2. Sistema y desarrollo
-sudo pacman -S --needed \
-  rclone fuse3 ntfs-3g \
-  neovim gcc make tree-sitter-cli \
-  ripgrep fd fzf bat btop \
-  git lazygit \
-  unzip tar curl wget jq \
-  docker docker-compose \
-  mpv imv fastfetch eza socat foot \
-  ttf-jetbrains-mono-nerd chezmoi
-
-# 3. AUR (Voxtype, Mise, OnlyOffice, Galculator)
-paru -S --needed \
-  mise-bin voxtype-bin onlyoffice-bin \
-  galculator translate-shell
-
+sudo pacman -S --needed rclone fuse3 ntfs-3g translate-shell
+yay -S --needed voxtype-bin onlyoffice-bin ttf-ms-fonts ttf-vista-fonts ttf-aptos-fonts
 fc-cache -fv
 
-# 4. Habilitar servicio Docker e incorporar usuario al grupo
+# Habilitar servicio Docker e incorporar usuario al grupo
 sudo systemctl enable --now docker
 sudo usermod -aG docker $USER
 ```
 
 ### Paso 4: Desplegar Dotfiles con Chezmoi
 ```bash
-# 1. Instalar chezmoi
-sudo pacman -S --needed chezmoi git
+# 1. Instalar chezmoi (vía mise o pacman)
+mise use -g chezmoi || sudo pacman -S chezmoi
 
 # 2. Inicializar y aplicar todo tu entorno en 1 paso:
 chezmoi init --apply https://github.com/lumusitech/dotfiles.git
@@ -143,9 +108,9 @@ Copiar tu archivo `rclone.conf` con las credenciales de Google Drive y OneDrive 
 
 ---
 
-## 🪟 Virtualización: Windows 11 VM (Docker / KVM)
+## 🪟 Virtualización: Windows 11 VM en Omarchy 4
 
-Virtualización KVM asistida por Docker (`dockurr/windows`) con acceso por FreeRDP (`xfreerdp3`), escalado HiDPI dinámico en Hyprland y ciclo de vida automatizado vía el script [`launch-windows-vm`](dot_local/bin/executable_launch-windows-vm).
+Omarchy 4 integra virtualización KVM asistida por Docker (`dockurr/windows`) con acceso por FreeRDP (`xfreerdp3`), escalado HiDPI dinámico en Hyprland y ciclo de vida automatizado vía el script [`launch-windows-vm`](dot_local/bin/executable_launch-windows-vm).
 
 * **Arranque y sondeo activo:** Espera automáticamente la disponibilidad del protocolo RDP (X.224) antes de conectar.
 * **Seguridad y compatibilidad:** Forzado de `/sec:tls /cert:ignore` para compatibilidad con la configuración de `dockurr/windows` (`UserAuthentication=0`).

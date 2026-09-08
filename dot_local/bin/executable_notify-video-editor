@@ -11,7 +11,7 @@ socat -U - "UNIX-CONNECT:$SOCKET" | while read -r line; do
   case "$line" in
     openwindow*kdenlive*|openwindow*org.kde.kdenlive*|openwindow*omacut*|openwindow*obs*|openwindow*shotcut*)
       notify-send \
-        --app-name="Video Studio" \
+        --app-name="Omarchy Studio" \
         --icon="video-x-generic" \
         "Comando: drive-compress [nombre].mp4" \
         "Reduce el tamaño con VA-API en RX 7600 para subir a Google Drive y compartir."

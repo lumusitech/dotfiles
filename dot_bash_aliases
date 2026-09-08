@@ -1,20 +1,13 @@
 # ==============================================================================
-# ~/.bash_aliases - Compatibilidad nativa con CachyOS & Arch Linux
+# ~/.bash_aliases - Compatibilidad nativa con Omarchy 4
 # ==============================================================================
 
 # ------------------------------------------------------------------------------
-# 1. NAVEGACIÓN Y LISTADO
+# 1. NAVEGACIÓN Y LISTADO (eza ya está integrado por Omarchy en ls)
 # ------------------------------------------------------------------------------
-if command -v eza >/dev/null 2>&1; then
-  alias ls='eza --icons'
-  alias ll='eza -lF --icons'
-  alias la='eza -a --icons'
-  alias l='eza -CF --icons'
-else
-  alias ll='ls -lF'
-  alias la='ls -A'
-  alias l='ls -CF'
-fi
+alias ll='ls -lF'
+alias la='ls -A'
+alias l='ls -CF'
 alias cl='clear'
 alias hist='history'
 
@@ -23,6 +16,7 @@ alias hist='history'
 # ------------------------------------------------------------------------------
 alias gs='git status -sb'
 
+# 'ga' y 'gd' son funciones nativas de Omarchy. Usamos 'gad' y 'gdf':
 alias gad='git add'
 alias gaa='git add --all'
 alias gapa='git add --patch'
@@ -35,6 +29,7 @@ alias gca='git commit -v -a'
 alias gco='git checkout'
 alias gcb='git checkout -b'
 
+# gb está libre en Omarchy:
 alias gb='git branch'
 alias gba='git branch -a'
 alias gbd='git branch -d'

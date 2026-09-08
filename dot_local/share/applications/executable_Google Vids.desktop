@@ -2,7 +2,7 @@
 Version=1.0
 Name=Google Vids
 Comment=Google Vids
-Exec=launch-webapp "https://docs.google.com/videos/u/0/"
+Exec=omarchy-launch-webapp "https://docs.google.com/videos/u/0/"
 Terminal=false
 Type=Application
 Icon=google-vids

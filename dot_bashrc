@@ -1,12 +1,22 @@
-# If not running interactively, don't do anything else
+# Omarchy environment (OMARCHY_PATH + PATH), needed even for non-interactive shells
+[[ -r /usr/share/omarchy/default/bash/env-bootstrap ]] && source /usr/share/omarchy/default/bash/env-bootstrap
+
+# If not running interactively, don't do anything else (leave this above the rc source)
 [[ $- != *i* ]] && return
 
-# ble.sh syntax highlighting & autosuggestions (si está instalado)
 [[ -f ~/.local/share/blesh/ble.sh ]] && source ~/.local/share/blesh/ble.sh --noattach
 
-# Variables de entorno de binarios y cargo (si existen)
-[[ -f "$HOME/.local/bin/env" ]] && . "$HOME/.local/bin/env"
-[[ -f "$HOME/.cargo/env" ]] && . "$HOME/.cargo/env"
+# All the default Omarchy aliases and functions
+# (don't mess with these directly, just overwrite them here!)
+source "$OMARCHY_PATH/default/bash/rc"
+
+# Add your own exports, aliases, and functions here.
+#
+# Make an alias for invoking commands you use constantly
+# alias p='python'
+
+. "$HOME/.local/share/../bin/env"
+. "$HOME/.cargo/env"
 
 # pnpm
 export PNPM_HOME="/home/carludev/.local/share/pnpm"
@@ -15,9 +25,9 @@ case ":$PATH:" in
   *) export PATH="$PNPM_HOME/bin:$PATH" ;;
 esac
 # pnpm end
-
-# FZF keybindings y autocompletado
-command -v fzf >/dev/null 2>&1 && eval "$(fzf --bash)"
+#
+# # FZF keybindings y autocompletado
+eval "$(fzf --bash)"
 
 # Cargar aliases personalizados
 [[ -f ~/.bash_aliases ]] && source ~/.bash_aliases
@@ -45,6 +55,5 @@ export PATH="$PATH:/home/carludev/.lmstudio/bin"
 
 
 
-# Load Angular CLI autocompletion (si está instalado).
-command -v ng >/dev/null 2>&1 && source <(ng completion script)
-
+# Load Angular CLI autocompletion.
+source <(ng completion script)

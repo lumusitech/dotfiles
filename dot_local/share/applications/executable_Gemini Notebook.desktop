@@ -2,7 +2,7 @@
 Version=1.0
 Name=Gemini Notebook
 Comment=Gemini Notebook
-Exec=launch-webapp "https://notebook.google.com/?utm_source=app_launcher&utm_medium=referral&authuser=0&pli=1"
+Exec=omarchy-launch-webapp "https://notebook.google.com/?utm_source=app_launcher&utm_medium=referral&authuser=0&pli=1"
 Terminal=false
 Type=Application
 Icon=gemini-notebook
