@@ -83,7 +83,7 @@ sudo pacman -S --needed rclone fuse3 ntfs-3g translate-shell
 yay -S --needed voxtype-bin onlyoffice-bin ttf-ms-fonts ttf-vista-fonts ttf-aptos-fonts
 fc-cache -fv
 
-# Habilitar servicio Docker e incorporar usuario al grupo
+# Habilitar servicio Docker e incorporar usuario al grupo (cerrar sesión y volver a entrar o 'newgrp docker')
 sudo systemctl enable --now docker
 sudo usermod -aG docker $USER
 ```
@@ -91,7 +91,7 @@ sudo usermod -aG docker $USER
 ### Paso 4: Desplegar Dotfiles con Chezmoi
 ```bash
 # 1. Instalar chezmoi (vía mise o pacman)
-mise use -g chezmoi || sudo pacman -S chezmoi
+mise use -g chezmoi || sudo pacman -S --needed chezmoi
 
 # 2. Inicializar y aplicar todo tu entorno en 1 paso:
 chezmoi init --apply https://github.com/lumusitech/dotfiles.git
