@@ -86,6 +86,11 @@ fc-cache -fv
 # Habilitar servicio Docker e incorporar usuario al grupo (cerrar sesión y volver a entrar o 'newgrp docker')
 sudo systemctl enable --now docker
 sudo usermod -aG docker $USER
+
+# Aprovisionar prevención de instant wake (suspensión profunda sólo con botón Power)
+sudo cp docs/systemd/disable-wakeup-triggers.service /etc/systemd/system/
+sudo systemctl daemon-reload
+sudo systemctl enable disable-wakeup-triggers.service
 ```
 
 ### Paso 4: Desplegar Dotfiles con Chezmoi

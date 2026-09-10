@@ -4,8 +4,12 @@
 
 [[ -f ~/.bashrc ]] && . ~/.bashrc
 
-. "$HOME/.local/share/../bin/env"
-. "$HOME/.cargo/env"
+if [[ -f "$HOME/.local/bin/env" ]]; then
+    . "$HOME/.local/bin/env"
+fi
+if [[ -f "$HOME/.cargo/env" ]]; then
+    . "$HOME/.cargo/env"
+fi
 
 
 # Added by Antigravity CLI installer

@@ -13,6 +13,7 @@ application/vnd.openxmlformats-officedocument.wordprocessingml.document=onlyoffi
 application/msword=onlyoffice-desktopeditors.desktop
 application/vnd.openxmlformats-officedocument.presentationml.presentation=onlyoffice-desktopeditors.desktop
 application/vnd.ms-powerpoint=onlyoffice-desktopeditors.desktop
+x-scheme-handler/antigravity=antigravity.desktop
 
 [Added Associations]
 application/x-zerosize=com.google.Chrome.desktop;

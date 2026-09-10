@@ -50,7 +50,7 @@ sudo mkdir -p /mnt/DATOS-2TB /mnt/BACKUP-1TB /mnt/BACKUP-4TB
 
 # 2. Agregar entradas a /etc/fstab (validar UUIDs con 'lsblk -f')
 sudo tee -a /etc/fstab << 'FSTAB_EOF'
-UUID=TU_UUID_DATOS-2TB    /mnt/DATOS-2TB    ntfs-3g  defaults,uid=1000,gid=1000,umask=022,nofail  0  0
+UUID=0278063D78062FC9    /mnt/DATOS-2TB    ntfs-3g  defaults,uid=1000,gid=1000,umask=022,nofail  0  0
 UUID=F2BA16E0BA16A161     /mnt/BACKUP-1TB   ntfs-3g  defaults,uid=1000,gid=1000,umask=022,nofail  0  0
 UUID=B8A0029FA002646A     /mnt/BACKUP-4TB   ntfs-3g  defaults,uid=1000,gid=1000,umask=022,nofail  0  0
 FSTAB_EOF
@@ -163,7 +163,16 @@ irm https://get.activated.win | iex
 3. Seleccionar la opción **HWID** (*Hardware ID digital persistente*, recomendada) o **KMS38**. Se activa de por vida en segundos ante los servidores oficiales de Microsoft sin dejar procesos en segundo plano. (Detalles en [`docs/windows-vm-activation.md`](docs/windows-vm-activation.md)).
 
 * **Suspensión Profunda / Prevención de Despertar Instantáneo (Instant Wake):**
-Evita que eventos espurios en buses PCIe (dispositivos NVMe, interfaces de red) o periféricos USB (sensores de ratón óptico) despierten el equipo de inmediato tras suspender. Se configura una unidad systemd oneshot antes de `sleep.target` para deshabilitar los triggers en sysfs, permitiendo que la máquina solo se reactive presionando el botón físico de encendido (*Power*):
+Evita que eventos espurios en buses PCIe (dispositivos NVMe, interfaces de red) o periféricos USB (sensores de ratón óptico) despierten el equipo de inmediato tras suspender. Se configura una unidad systemd oneshot antes de `sleep.target` para deshabilitar los triggers en sysfs, permitiendo que la máquina solo se reactive presionando el botón físico de encendido (*Power*).
+
+Puedes copiar directamente la unidad provista en el repositorio ([`docs/systemd/disable-wakeup-triggers.service`](docs/systemd/disable-wakeup-triggers.service)):
+```bash
+sudo cp docs/systemd/disable-wakeup-triggers.service /etc/systemd/system/
+sudo systemctl daemon-reload
+sudo systemctl enable disable-wakeup-triggers.service
+```
+
+O generarla manualmente:
 ```bash
 sudo tee /etc/systemd/system/disable-wakeup-triggers.service << 'EOF'
 [Unit]
