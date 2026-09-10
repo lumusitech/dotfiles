@@ -155,6 +155,7 @@ RDP_OPTS=(
   /sec:tls
   /cert:ignore
   /network:lan
+  /f
   -grab-keyboard
   /sound
   /microphone
@@ -186,9 +187,10 @@ DURATION=$(( END_TIME - START_TIME ))
 
 echo "[$(date '+%Y-%m-%d %H:%M:%S')] Sesión FreeRDP finalizada con código: $RDP_EXIT_CODE (duración: ${DURATION}s)" >> "$LOG_FILE"
 
-# 7. Ciclo de vida posterior y manejo de reintentos
-# Si la conexión duró menos de 3 segundos o devolvió código de error, reintentar una vez tras breve pausa
-if (( DURATION < 3 || RDP_EXIT_CODE != 0 )); then
+# 7. Ciclo de vida posterior y manejo de desconexiones
+# Código 12 en FreeRDP es ERRINFO_LOGOFF_BY_USER (cierre de sesión, reinicio o apagado normal desde Windows).
+# Solo se debe reintentar si la sesión cayó prematuramente en el arranque (< 5s) por fallo de conexión.
+if (( DURATION < 5 && RDP_EXIT_CODE != 0 && RDP_EXIT_CODE != 12 )); then
   echo "[$(date '+%Y-%m-%d %H:%M:%S')] Reintentando conexión tras salida prematura..." >> "$LOG_FILE"
   sleep 2
   if wait_for_rdp; then
@@ -197,6 +199,11 @@ if (( DURATION < 3 || RDP_EXIT_CODE != 0 )); then
     xfreerdp3 "${RDP_OPTS[@]}" >> "$LOG_FILE" 2>&1 || RDP_EXIT_CODE=$?
     echo "[$(date '+%Y-%m-%d %H:%M:%S')] Reintento finalizado con código: $RDP_EXIT_CODE" >> "$LOG_FILE"
   fi
+fi
+
+# Si el usuario cerró sesión normalmente (código 12), normalizar a salida limpia
+if (( RDP_EXIT_CODE == 12 )); then
+  RDP_EXIT_CODE=0
 fi
 
 if (( RDP_EXIT_CODE != 0 )); then

@@ -44,6 +44,7 @@ Se implementó el script wrapper [`launch-windows-vm`](file:///home/carludev/.lo
 * **Escalado HiDPI dinámico:** Lee la escala activa del monitor actual en Hyprland (`hyprctl monitors -j`) y ajusta `/scale:140` o `/scale:180` si corresponde.
 * **Compatibilidad de seguridad TLS (`/sec:tls /cert:ignore`):** La instalación desatendida de `dockurr/windows` desactiva NLA (`<UserAuthentication>0</UserAuthentication>`), por lo que FreeRDP 3 se configura explícitamente en modo TLS con bypass de certificados autofirmados.
 * **Optimización LAN (`/network:lan`):** Habilita la optimización de latencia y caché para la conexión local en loopback.
+* **Pantalla completa nativa (`/f`):** Inicia directamente a resolución nativa del monitor eliminando el marco negro de negociación por defecto (1024x768). Gracias a `/dynamic-resolution`, presionar `Super + F` conmuta limpiamente a modo ventana adaptando la resolución en tiempo real.
 * **Registro persistente de diagnóstico:** Desvía toda la salida y errores de FreeRDP a `~/.local/state/windows-vm-rdp.log` con marcas de tiempo y captura del código de salida `$RDP_EXIT_CODE`.
 * **Diferenciación de errores:** Notifica fallos de conexión explícitamente en lugar de asumir que la sesión se cerró normalmente por el usuario.
 * **Ciclo de vida limpio:** Si la sesión termina normalmente, detiene el contenedor para ahorrar recursos de CPU y RAM. Si se desea mantener la VM encendida en segundo plano, admite el parámetro `-k` o `--keep-alive`.
