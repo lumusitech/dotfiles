@@ -15,8 +15,10 @@ RDP_HOST="127.0.0.1"
 RDP_PORT=3389
 CREDENTIALS_FILE="$HOME/.config/windows/credentials"
 COMPOSE_FILE="${OMARCHY_WINDOWS_DIR:-/var/lib/omarchy/windows}/docker-compose.yml"
-TIMEOUT_SECONDS=60
+TIMEOUT_SECONDS=120
 KEEP_ALIVE=false
+LOG_FILE="$HOME/.local/state/windows-vm-rdp.log"
+mkdir -p "$(dirname "$LOG_FILE")"
 
 # Soporte de argumentos
 for arg in "$@"; do
@@ -39,11 +41,14 @@ notify() {
 }
 
 start_vm_container() {
+  # Asegurar permisos estrictos 0700 sin bits especiales (SGID) que bloqueen las validaciones de Omarchy
+  chmod 00700 "$HOME/.windows" "$HOME/Windows" 2>/dev/null || true
+  chmod g-s "$HOME/.windows" "$HOME/Windows" 2>/dev/null || true
   (
     set +u
     source /usr/bin/omarchy-windows-vm "" >/dev/null 2>&1
     priv up
-  )
+  ) >> "$LOG_FILE" 2>&1
 }
 
 stop_vm_container() {
@@ -51,7 +56,7 @@ stop_vm_container() {
     set +u
     source /usr/bin/omarchy-windows-vm "" >/dev/null 2>&1
     priv down
-  )
+  ) >> "$LOG_FILE" 2>&1
 }
 
 # 1. Verificar si el contenedor está en ejecución
@@ -144,9 +149,7 @@ elif (( SCALE_PERCENT >= 130 )); then
   RDP_SCALE="/scale:140"
 fi
 
-# 6. Preparar log y opciones de FreeRDP
-LOG_FILE="$HOME/.local/state/windows-vm-rdp.log"
-mkdir -p "$(dirname "$LOG_FILE")"
+# 6. Preparar opciones de FreeRDP
 
 RDP_OPTS=(
   /u:"$WIN_USER"

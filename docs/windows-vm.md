@@ -34,17 +34,19 @@ El script upstream `/usr/share/omarchy/bin/omarchy-windows-vm` presentaba una co
 Se implementó el script wrapper [`launch-windows-vm`](file:///home/carludev/.local/bin/launch-windows-vm) en `~/.local/bin/` y se actualizó el lanzador [windows-vm.desktop](file:///home/carludev/.local/share/applications/windows-vm.desktop):
 
 ### Mejoras incorporadas:
-* **Sondeo activo de protocolo RDP:** Envía peticiones de conexión X.224 estándar en un bucle con límite de 60 segundos. Solo invoca a `xfreerdp3` cuando Windows 11 realmente responde y está listo para recibir la sesión.
+* **Sondeo activo de protocolo RDP:** Envía peticiones de conexión X.224 estándar en un bucle con límite extendido de hasta 120 segundos para tolerar arranques en frío lentos o instalaciones de actualizaciones en Windows. Solo invoca a `xfreerdp3` cuando Windows 11 realmente responde y está listo para recibir la sesión.
 * **Notificaciones de escritorio nativas:** Informa en tiempo real al usuario mediante `omarchy-notification-send`:
   * *Iniciando máquina virtual en segundo plano...*
   * *Esperando a que Windows 11 complete el inicio del sistema...*
   * *Conectando sesión de escritorio remoto...*
-* **Manejo resiliente de permisos:** Sincroniza con las rutinas de seguridad de `omarchy-windows-vm` para montar unidades y pedir autorización Polkit solo cuando sea estrictamente necesario tras un reinicio.
+* **Manejo resiliente de permisos y saneamiento SGID:** Sincroniza con las rutinas de seguridad de `omarchy-windows-vm` para montar unidades y pedir autorización Polkit solo cuando sea estrictamente necesario tras un reinicio. Además, sanea automáticamente permisos a `0700` y remueve bits SGID (`chmod g-s`) en `~/.windows` y `~/Windows` para evitar fallos de validación.
 * **Configuración Kerberos protegida:** Exporta automáticamente la configuración de `krb5.conf` con `dns_lookup_kdc = false` para evitar bloqueos de 23 segundos al conectar.
 * **Escalado HiDPI dinámico:** Lee la escala activa del monitor actual en Hyprland (`hyprctl monitors -j`) y ajusta `/scale:140` o `/scale:180` si corresponde.
 * **Compatibilidad de seguridad TLS (`/sec:tls /cert:ignore`):** La instalación desatendida de `dockurr/windows` desactiva NLA (`<UserAuthentication>0</UserAuthentication>`), por lo que FreeRDP 3 se configura explícitamente en modo TLS con bypass de certificados autofirmados.
 * **Optimización LAN (`/network:lan`):** Habilita la optimización de latencia y caché para la conexión local en loopback.
 * **Pantalla completa nativa (`/f`):** Inicia directamente a resolución nativa del monitor eliminando el marco negro de negociación por defecto (1024x768). Gracias a `/dynamic-resolution`, presionar `Super + F` conmuta limpiamente a modo ventana adaptando la resolución en tiempo real.
+* **Gestión de desconexiones y reinicios (Código 12):** Distingue entre un fallo prematuro de conexión y un cierre voluntario o reinicio por actualizaciones (código de salida 12 `ERRINFO_LOGOFF_BY_USER`), evitando falsos positivos de reintento.
+* **Wrapper de terminal transparente (`omarchy-windows-vm`):** En `~/.bash_aliases`, intercepta `omarchy-windows-vm launch` o `start` desde la terminal y lo redirige automáticamente a `launch-windows-vm` con sondeo activo.
 * **Registro persistente de diagnóstico:** Desvía toda la salida y errores de FreeRDP a `~/.local/state/windows-vm-rdp.log` con marcas de tiempo y captura del código de salida `$RDP_EXIT_CODE`.
 * **Diferenciación de errores:** Notifica fallos de conexión explícitamente en lugar de asumir que la sesión se cerró normalmente por el usuario.
 * **Ciclo de vida limpio:** Si la sesión termina normalmente, detiene el contenedor para ahorrar recursos de CPU y RAM. Si se desea mantener la VM encendida en segundo plano, admite el parámetro `-k` o `--keep-alive`.
@@ -87,6 +89,11 @@ omarchy-windows-vm stop
 
 ### Correcciones Aplicadas en `launch-windows-vm`:
 * Forzado de protocolo `/sec:tls` junto con `/cert:ignore` y `/network:lan`.
+* Pantalla completa nativa con `/f` e integración fluida con `Super + F` para alternar modo ventana.
+* Límite de sondeo activo extendido a 120s para soportar arranques lentos tras reinicios por parches de Windows.
+* Normalización del código de salida 12 (`ERRINFO_LOGOFF_BY_USER`) para tratar cierres de sesión y reinicios normales como salidas exitosas.
+* Saneamiento preventivo de permisos (`chmod 00700` y `chmod g-s`) en `~/.windows` y `~/Windows` para compatibilidad con las validaciones de Omarchy.
+* Intercepción transparente en terminal mediante la función shell `omarchy-windows-vm` en `~/.bash_aliases`.
 * Breve pausa de estabilización (1s) tras la confirmación de socket X.224 para permitir que `TermService` termine de alistar sus hilos de atención.
 * Redirección continua a `~/.local/state/windows-vm-rdp.log` registrando inicio, duración y código de salida exacto.
 * Notificación crítica descriptiva si `$RDP_EXIT_CODE != 0`.
