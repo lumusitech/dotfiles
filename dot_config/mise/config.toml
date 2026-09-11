@@ -15,3 +15,6 @@ opencode = "latest"
 pnpm = "latest"
 python = "latest"
 rust = "stable"
+
+[settings.upgrade]
+auto_prune = false
