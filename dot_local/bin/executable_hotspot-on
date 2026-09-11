@@ -1,0 +1,8 @@
+#!/bin/bash
+echo "📡 Iniciando Hotspot 5GHz (PC-5G)..."
+if nmcli con up Hotspot-5G; then
+    notify-send -i network-wireless-symbolic "Hotspot 5G" "Red PC-5G activada (5GHz)" 2>/dev/null
+    echo "✅ Hotspot 5G activado. Conéctate a 'PC-5G' en tu tablet."
+else
+    echo "❌ Error al iniciar el Hotspot."
+fi

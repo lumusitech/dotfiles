@@ -1,0 +1,18 @@
+#!/bin/bash
+URI="$1"
+DEVICE_ID=$(echo "$URI" | sed -E 's|kdeconnect://([^/]+).*|\1|')
+
+if [ -n "$DEVICE_ID" ]; then
+    busctl --user call org.kde.kdeconnect /modules/kdeconnect/devices/"$DEVICE_ID"/sftp org.kde.kdeconnect.device.sftp mountAndWait >/dev/null 2>&1
+    for i in {1..6}; do
+        MOUNTPOINT=$(busctl --user call org.kde.kdeconnect /modules/kdeconnect/devices/"$DEVICE_ID"/sftp org.kde.kdeconnect.device.sftp mountPoint 2>/dev/null | awk -F'"' '{print $2}')
+        if [ -n "$MOUNTPOINT" ] && [ -d "$MOUNTPOINT/storage/emulated/0" ]; then
+            exec nautilus "$MOUNTPOINT/storage/emulated/0"
+            exit 0
+        elif [ -n "$MOUNTPOINT" ] && [ -d "$MOUNTPOINT" ]; then
+            exec nautilus "$MOUNTPOINT"
+            exit 0
+        fi
+        sleep 0.5
+    done
+fi
