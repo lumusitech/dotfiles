@@ -1,0 +1,8 @@
+#!/bin/bash
+echo "🔌 Apagando Hotspot 5GHz (PC-5G)..."
+if nmcli con down Hotspot-5G; then
+    notify-send -i network-wireless-offline-symbolic "Hotspot 5G" "Red PC-5G desactivada" 2>/dev/null
+    echo "✅ Hotspot 5G apagado. Tu tablet volverá a su Wi-Fi habitual."
+else
+    echo "ℹ️ El Hotspot no estaba activo."
+fi

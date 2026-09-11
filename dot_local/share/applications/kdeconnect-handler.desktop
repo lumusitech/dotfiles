@@ -1,0 +1,8 @@
+[Desktop Entry]
+Name=KDE Connect Filesystem Handler
+Comment=Open KDE Connect device in Nautilus
+Exec=/home/carludev/.local/bin/kdeconnect-nautilus-handler %u
+Terminal=false
+Type=Application
+NoDisplay=true
+MimeType=x-scheme-handler/kdeconnect;

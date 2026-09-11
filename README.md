@@ -53,6 +53,12 @@ yay -S --needed onlyoffice-bin ttf-ms-fonts ttf-vista-fonts ttf-aptos-fonts
 fc-cache -fv
 ```
 
+#### 4. Integración Móvil, Streaming y Red Hotspot 5G
+```bash
+sudo pacman -S --needed kdeconnect breeze qqc2-breeze-style sshfs dnsmasq sunshine
+yay -S --needed hypr-kdeconnect-fix-git
+```
+
 ---
 
 ## 🔄 Protocolo de Restauración desde Cero (Disaster Recovery)
@@ -79,13 +85,22 @@ sudo mount -a
 
 ### Paso 3: Instalar únicamente el Delta y habilitar Docker
 ```bash
-sudo pacman -S --needed rclone fuse3 ntfs-3g translate-shell
-yay -S --needed voxtype-bin onlyoffice-bin ttf-ms-fonts ttf-vista-fonts ttf-aptos-fonts
+sudo pacman -S --needed rclone fuse3 ntfs-3g translate-shell kdeconnect breeze qqc2-breeze-style sshfs dnsmasq sunshine
+yay -S --needed voxtype-bin onlyoffice-bin ttf-ms-fonts ttf-vista-fonts ttf-aptos-fonts hypr-kdeconnect-fix-git
 fc-cache -fv
 
 # Habilitar servicio Docker e incorporar usuario al grupo (cerrar sesión y volver a entrar o 'newgrp docker')
 sudo systemctl enable --now docker
 sudo usermod -aG docker $USER
+
+# Habilitar servicio de streaming Sunshine para el usuario
+systemctl --user enable --now app-dev.lizardbyte.app.Sunshine.service
+
+# Reglas de Firewall (UFW) para Sunshine, Hotspot y reenvío de Internet (wlo1 -> enp5s0)
+sudo ufw allow 47984:48010/tcp
+sudo ufw allow 47984:48010/udp
+sudo ufw allow in on wlo1
+sudo ufw route allow in on wlo1 out on enp5s0
 
 # Aprovisionar prevención de instant wake (suspensión profunda sólo con botón Power)
 sudo cp docs/systemd/disable-wakeup-triggers.service /etc/systemd/system/
@@ -123,6 +138,19 @@ Omarchy 4 integra virtualización KVM asistida por Docker (`dockurr/windows`) co
 * **Modo persistente:** Admite `--keep-alive` (`-k`) para mantener la VM encendida al cerrar la ventana de FreeRDP.
 
 📖 Documentación técnica completa y runbook: [`docs/windows-vm.md`](docs/windows-vm.md).
+
+---
+
+## 📱 Integración Móvil, Streaming y Hotspot 5 GHz
+
+Omarchy 4 integra una suite de sincronización y duplicación de pantalla optimizada para tablets y smartphones (Samsung Galaxy Tab / Android):
+
+* **KDE Connect sobre Hyprland:** Autostart del indicador con integración nativa de tema oscuro (`dot_config/kdeglobals`), soporte de mouse/teclado y S-Pen en Wayland vía `hypr-kdeconnect-fix-git` (`libei`), y navegación directa de archivos en Nautilus mediante handler personalizado.
+* **Sunshine + Moonlight:** Streaming de pantalla a 60 FPS con codificación por hardware AMD VAAPI, baja latencia y soporte para gestos táctiles.
+* **Hotspot Wi-Fi Dedicado 5 GHz (`PC-5G`):** Punto de acceso en canal 36 (5180 MHz) vía `wlo1` con DHCP (`dnsmasq`) y reenvío de tráfico internet a través de Ethernet Gigabit (`enp5s0`), eliminando por completo el jitter y los microcortes de audio causados por el *Band Steering* del router hogareño.
+* **Scripts de control rápido:** Utilitarios [`hotspot-on`](dot_local/bin/executable_hotspot-on), [`hotspot-off`](dot_local/bin/executable_hotspot-off) y [`hotspot`](dot_local/bin/executable_hotspot) en `~/.local/bin/`.
+
+📖 Documentación técnica completa, diagnóstico de hardware y runbook: [`docs/mobile-and-remote-streaming.md`](docs/mobile-and-remote-streaming.md).
 
 ---
 
@@ -215,6 +243,9 @@ czmain
 | **`czmain`** | Cambiar a `main`, descargar lo mergeado, auto-eliminar ramas del PR y aplicar dotfiles. |
 | **`czcd`** | Abrir una sub-terminal directamente dentro del repositorio Chezmoi. |
 | **`czup`** | En otra computadora: descargar lo último de GitHub y aplicarlo de inmediato. |
+| **`hotspot`** | Alternar encendido/apagado del Hotspot Wi-Fi 5 GHz (`PC-5G`). |
+| **`hotspot-on`** | Activar Hotspot Wi-Fi 5 GHz dedicado para streaming de pantalla. |
+| **`hotspot-off`** | Desactivar Hotspot 5 GHz y devolver dispositivos al Wi-Fi del hogar. |
 
 > [!TIP]
 > **¿No te reconoce algún comando o alias?**

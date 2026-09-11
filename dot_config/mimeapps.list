@@ -14,6 +14,7 @@ application/msword=onlyoffice-desktopeditors.desktop
 application/vnd.openxmlformats-officedocument.presentationml.presentation=onlyoffice-desktopeditors.desktop
 application/vnd.ms-powerpoint=onlyoffice-desktopeditors.desktop
 x-scheme-handler/antigravity=antigravity.desktop
+x-scheme-handler/kdeconnect=kdeconnect-handler.desktop
 
 [Added Associations]
 application/x-zerosize=com.google.Chrome.desktop;

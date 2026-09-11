@@ -6,3 +6,5 @@
 -- ==========================================
 -- Omarchy Autostart Services
 -- ==========================================
+
+o.launch_on_start("kdeconnect-indicator")
