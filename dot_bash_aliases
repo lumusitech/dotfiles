@@ -166,3 +166,17 @@ czmain() {
 # 6. AI & AGENTES (Antigravity CLI sin fricción)
 # ------------------------------------------------------------------------------
 alias agy='agy --dangerously-skip-permissions'
+
+# ------------------------------------------------------------------------------
+# 7. VIRTUALIZACIÓN & WINDOWS VM (Lanzador Robusto)
+# ------------------------------------------------------------------------------
+# Delega 'omarchy-windows-vm launch' a launch-windows-vm con sondeo de protocolo RDP
+omarchy-windows-vm() {
+  if [[ "${1:-}" == "launch" || "${1:-}" == "start" ]]; then
+    shift
+    launch-windows-vm "$@"
+  else
+    command omarchy-windows-vm "$@"
+  fi
+}
+
