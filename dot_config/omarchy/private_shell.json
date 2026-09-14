@@ -7,6 +7,9 @@
           "id": "omarchy.indicators"
         },
         {
+          "id": "omarchy.spacer"
+        },
+        {
           "format": "dddd HH:mm",
           "formatAlt": "d MMMM 'W'ww yyyy",
           "id": "omarchy.clock",
@@ -19,6 +22,12 @@
           "id": "omarchy.weather"
         },
         {
+          "id": "omarchy.microphone"
+        },
+        {
+          "id": "omarchy.media"
+        },
+        {
           "id": "omarchy.system-update"
         }
       ],
@@ -28,14 +37,33 @@
         },
         {
           "id": "omarchy.workspaces"
+        },
+        {
+          "id": "omarchy.active-window"
         }
       ],
       "right": [
         {
-          "id": "omarchy.tray"
+          "id": "omarchy.agents"
         },
         {
-          "id": "omarchy.agents"
+          "id": "omarchy.tray",
+          "pinned": [
+            "KDE Connect Indicator"
+          ],
+          "hidden": []
+        },
+        {
+          "id": "agx.screen-time"
+        },
+        {
+          "id": "omamail"
+        },
+        {
+          "id": "io.github.x3me.nexthop"
+        },
+        {
+          "id": "omaconnect"
         },
         {
           "id": "omarchy.bluetooth"
@@ -61,6 +89,10 @@
     "lock": 300,
     "screensaver": 150
   },
-  "plugins": [],
+  "plugins": [
+    {
+      "id": "bobbynicholas.omaland"
+    }
+  ],
   "version": 1
 }
