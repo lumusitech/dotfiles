@@ -91,3 +91,19 @@ o.window({ class = ".*omacalc.*" }, {
 })
 
 
+
+-- >>> omaland managed block >>>
+-- Written by Omaland. Safe to hand-edit: Omaland re-reads this block
+-- every time it opens, and only ever rewrites what's between the fences.
+hl.config({
+  decoration = {
+    active_opacity = 1,
+    fullscreen_opacity = 1,
+    inactive_opacity = 1,
+
+    blur = {
+      enabled = true,
+    },
+  },
+})
+-- <<< omaland managed block <<<

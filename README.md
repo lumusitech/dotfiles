@@ -119,6 +119,7 @@ chezmoi init --apply https://github.com/lumusitech/dotfiles.git
 *Los hooks automáticos de Chezmoi se encargarán de:*
 * Sincronizar runtimes (`Node`, `Java`, `Python`, etc.) con `mise install`.
 * Descargar el modelo Whisper `small` de Voxtype de forma desatendida.
+* Aprovisionar y sincronizar la suite de plugins de Omarchy Shell (`quickshell-screentime`, `omaland`, `nexthop`, `omaconnect`, `omamail`), inyectar accesos de menú y refrescar la barra.
 * Habilitar y arrancar servicios de usuario (`rclone-mount@`, `onedrive-mount@`, `voxtype.service` y `notify-video-editor.service`).
 * Aplicar optimizaciones de visualización en Nautilus.
 * Desplegar todos los atajos de teclado, scripts de `~/.local/bin/`, webapps e iconos.
@@ -151,6 +152,68 @@ Omarchy 4 integra una suite de sincronización y duplicación de pantalla optimi
 * **Scripts de control rápido:** Utilitarios [`hotspot-on`](dot_local/bin/executable_hotspot-on), [`hotspot-off`](dot_local/bin/executable_hotspot-off) y [`hotspot`](dot_local/bin/executable_hotspot) en `~/.local/bin/`.
 
 📖 Documentación técnica completa, diagnóstico de hardware y runbook: [`docs/mobile-and-remote-streaming.md`](docs/mobile-and-remote-streaming.md).
+
+---
+
+## 🧩 Ecosistema de Plugins y Barra en Omarchy 4 (Omarchy Shell & Hyprland)
+
+Omarchy 4 desacopla la gestión del entorno en dos capas:
+1. **`omarchy-shell` (Quickshell):** Un runtime único y persistente que aloja la barra de estado (`omarchy.bar`), notificaciones, menús (`omarchy.menu`), overlays y paneles modales. Se configura de forma reactiva en `~/.config/omarchy/shell.json` y se extiende con plugins en `~/.config/omarchy/plugins/<id>/`.
+2. **Hyprland configurado en Lua:** La arquitectura de ventanas y atajos se define en `~/.config/hypr/` (`hyprland.lua`, `bindings.lua`, `looknfeel.lua`, etc.) usando las tablas globales `o` y `hl`.
+
+### 1. Tipos de Plugins en Omarchy Shell (`manifest.json`)
+* **`bar-widget`:** Componentes con representación visual en la barra de estado (`left`, `center`, `right`). Se insertan directamente en `bar.layout` de `shell.json`.
+* **`panel` / `overlay` / `service`:** Ventanas emergentes flotantes (HUDs, inspectores gráficos) o procesos en segundo plano. Se declaran en el arreglo `"plugins": [{"id": "..."}]` de `shell.json` y se invocan bajo demanda (atajo de teclado o menú).
+
+### 2. Comandos Nativos de Orquestación
+```bash
+# 1. Ver plugins descubiertos (first-party y third-party) con su estado y tipos
+omarchy plugin list
+
+# 2. Instalar un plugin desde GitHub
+omarchy plugin add https://github.com/autor/repo.git
+
+# 3. Ubicar un widget en una sección específica de la barra sin desordenar los existentes
+omarchy bar put <plugin-id> --section right --before omarchy.network
+
+# 4. Reubicar un widget por sección e índice
+omarchy bar move <plugin-id> --section right --index 2
+
+# 5. Clonar un widget nativo para modificar su código QML con seguridad
+omarchy plugin clone omarchy.workspaces
+# Crea ~/.config/omarchy/plugins/<usuario>.workspaces/ con recarga automática en caliente
+```
+
+### 3. Asignación de Atajos de Teclado en Hyprland (Lua)
+Los paneles y overlays que no viven fijos en la barra se disparan mediante IPC hacia `omarchy-shell`. Se configuran en `~/.config/hypr/bindings.lua`:
+```lua
+-- Lanzar o alternar el inspector visual de Hyprland (Omaland)
+o.bind("SUPER + SHIFT + O", "Omaland Look & Feel", "omarchy-shell shell toggle bobbynicholas.omaland")
+
+-- Invocar panel rápido de correos no leídos
+o.bind("SUPER + ALT + M", "Mail Glance", "omarchy-shell shell summon omamail")
+```
+
+### 4. Sandbox de Seguridad de Omarchy 4 y Resolución de Lanzadores (.desktop)
+Por diseño de seguridad, Omarchy Shell (`publicPluginManifest`) elimina la propiedad `__sourceDir` de los manifiestos de plugins de terceros. Plugins como **Omaland** que intentan autoinstalar su `.desktop` en tiempo de ejecución fallan silenciosamente si dependen de esa ruta.
+
+Para garantizar que aparezcan siempre en el buscador de aplicaciones (`Super + Space` / `Super + Alt + Space`) y en el menú contextual de Omarchy:
+1. **Lanzador de escritorio:** Se plantilla en `~/.local/share/applications/omaland.desktop` con `Exec=omarchy-shell shell toggle bobbynicholas.omaland`.
+2. **Integración en el menú:** Se añade a `~/.config/omarchy/extensions/omarchy-menu.jsonc`:
+   ```jsonc
+   "style.hyprland": {"icon":"","label":"Hyprland","aliases":["hyprland","looknfeel"]},
+   "style.hyprland.omaland": {"icon":"󰸌","label":"Visual Editor (Omaland)","aliases":["omaland","visual"],"action":"omarchy-shell shell toggle bobbynicholas.omaland"}
+   ```
+3. **Hook de aprovisionamiento Chezmoi:** El script `run_onchange_after_05_omarchy_plugins.sh.tmpl` clona automáticamente todos los plugins comunitarios, aplica el parche de resiliencia en `Service.qml` y refresca la base de datos de aplicaciones en cualquier máquina nueva.
+
+### 5. Suite Comunitaria Activa en este Entorno
+| Plugin | ID / Repositorio | Tipo | Función |
+| :--- | :--- | :--- | :--- |
+| **Omaland** | `bobbynicholas.omaland` | `panel`, `service` | GUI en vivo para gaps, bordes, desenfoque y animaciones en Hyprland. |
+| **OmaConnect** | `omaconnect` | `service`, `bar-widget` | Integración nativa de KDE Connect en la barra con estética Quickshell. |
+| **Omamail** | `omamail` | `service`, `bar-widget`, `panel` | Notificador discreto de correo (Gmail, HEY, IMAP). |
+| **Nexthop** | `io.github.x3me.nexthop` | `bar-widget`, `service` | Monitor de red que desglosa latencia de Wi-Fi local vs. ISP. |
+| **Screen Time** | `agx.screen-time` | `service`, `bar-widget` | Rastreo pasivo del tiempo productivo por aplicación. |
 
 ---
 

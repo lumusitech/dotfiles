@@ -1,0 +1,46 @@
+#!/usr/bin/env bash
+# Sincronización y aprovisionamiento de plugins de Omarchy Shell (Quickshell)
+# hash: {{ include "dot_config/omarchy/private_shell.json" | sha256sum }}
+
+set -euo pipefail
+
+PLUGINS_DIR="$HOME/.config/omarchy/plugins"
+mkdir -p "$PLUGINS_DIR"
+
+declare -A PLUGINS=(
+  ["agx.screen-time"]="https://github.com/ax1g/quickshell-screentime-plugin.git"
+  ["bobbynicholas.omaland"]="https://github.com/bobby-nicholas/omaland.git"
+  ["io.github.x3me.nexthop"]="https://github.com/x3me/omarchy-nexthop.git"
+  ["omaconnect"]="https://github.com/jitendradara12/omaconnect.git"
+  ["omamail"]="https://github.com/huacnlee/omamail.git"
+)
+
+for id in "${!PLUGINS[@]}"; do
+  url="${PLUGINS[$id]}"
+  target="$PLUGINS_DIR/$id"
+  if [ ! -d "$target" ]; then
+    echo "📦 Clonando plugin de Omarchy: $id..."
+    git clone --depth 1 "$url" "$target" 2>/dev/null || true
+  fi
+done
+
+# Parche de resiliencia para el sandbox de Omarchy 4 en Omaland
+OMALAND_SERVICE="$PLUGINS_DIR/bobbynicholas.omaland/Service.qml"
+if [ -f "$OMALAND_SERVICE" ]; then
+  if ! grep -q "plugins/bobbynicholas.omaland" "$OMALAND_SERVICE"; then
+    sed -i 's|var dir = manifest && manifest.__sourceDir|var dir = (manifest \&\& manifest.__sourceDir) \|\| (Quickshell.env("HOME") + "/.config/omarchy/plugins/bobbynicholas.omaland")|' "$OMALAND_SERVICE" || true
+  fi
+fi
+
+# Actualizar base de datos de aplicaciones de escritorio y refrescar Omarchy Shell
+if command -v update-desktop-database >/dev/null 2>&1; then
+  update-desktop-database "$HOME/.local/share/applications/" 2>/dev/null || true
+fi
+
+if command -v omarchy-shell >/dev/null 2>&1; then
+  omarchy-shell shell rescanPlugins 2>/dev/null || true
+fi
+
+if command -v omarchy >/dev/null 2>&1; then
+  omarchy menu refresh 2>/dev/null || true
+fi

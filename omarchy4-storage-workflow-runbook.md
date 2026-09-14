@@ -190,3 +190,50 @@ EOF
 sudo systemctl daemon-reload
 sudo systemctl enable disable-wakeup-triggers.service
 ```
+
+---
+
+## 6. Ecosistema de Plugins y Orquestación de la Barra (Omarchy Shell & Hyprland)
+
+Omarchy 4 divide la interfaz y el comportamiento del entorno en dos componentes:
+* **`omarchy-shell` (Quickshell):** Maneja la barra, notificaciones, menús, overlays y paneles. Se configura en `~/.config/omarchy/shell.json`.
+* **Hyprland (Lua):** Maneja atajos de teclado y lógica de ventanas en `~/.config/hypr/` (`hyprland.lua`, `bindings.lua`, etc.).
+
+### 6.1. Tipos de Plugins en Omarchy Shell
+* **`bar-widget`:** Vive fijo en una sección de la barra (`left`, `center`, `right`). Se ubica con `omarchy bar put` y se almacena en `bar.layout` de `shell.json`.
+* **`panel` / `overlay` / `service`:** Ventana flotante (HUD/Inspector) o servicio sin barra. Se almacena en `plugins: [{"id": "..."}]` de `shell.json` y se invoca por comando o atajo.
+
+### 6.2. Comandos Clave de Gestión
+```bash
+# Listar plugins descubiertos y estado
+omarchy plugin list
+
+# Ubicar widget en la barra
+omarchy bar put <plugin-id> --section right --before omarchy.network
+
+# Reordenar dentro de una sección
+omarchy bar move <plugin-id> --section right --index 2
+
+# Clonar widget nativo para modificar QML de forma segura
+omarchy plugin clone omarchy.workspaces
+```
+
+### 6.3. Asignación de Atajos en Hyprland Lua (`~/.config/hypr/bindings.lua`)
+```lua
+-- Abrir Omaland Look & Feel
+o.bind("SUPER + SHIFT + O", "Omaland Look & Feel", "omarchy-shell shell toggle bobbynicholas.omaland")
+
+-- Invocar panel rápido de correos
+o.bind("SUPER + ALT + M", "Mail Glance", "omarchy-shell shell summon omamail")
+```
+
+### 6.4. Sandbox de Seguridad y Resolución de Lanzadores (.desktop)
+Debido a que `publicPluginManifest` de Omarchy 4 elimina `__sourceDir` en plugins de terceros, se requiere:
+1. Asegurar el lanzador en `~/.local/share/applications/omaland.desktop`.
+2. Extender el menú de Omarchy en `~/.config/omarchy/extensions/omarchy-menu.jsonc`:
+```jsonc
+"style.hyprland": {"icon":"","label":"Hyprland","aliases":["hyprland","looknfeel"]},
+"style.hyprland.omaland": {"icon":"󰸌","label":"Visual Editor (Omaland)","aliases":["omaland","visual"],"action":"omarchy-shell shell toggle bobbynicholas.omaland"}
+```
+3. Automatizar la restauración con el hook Chezmoi `run_onchange_after_05_omarchy_plugins.sh.tmpl`.
+
