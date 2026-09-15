@@ -31,10 +31,11 @@ Objetivo: monitoreo preciso de hardware, busqueda ultra rapida y virtualizacion 
 * **Btop:** Monitoreo moderno de CPU, GPU, RAM y procesos en tiempo real.
 * **Fd & Ripgrep:** Reemplazos optimizados en Rust para find y grep.
 * **Bat:** Visualizador de archivos con resaltado de sintaxis e integracion Git.
+* **Superfile (`spf`):** Explorador de archivos moderno para terminal con pestañas y paneles.
 * **Docker & Docker Compose:** Contenedorizacion local para desarrollo.
 
 ```bash
-sudo pacman -S --needed btop fd ripgrep bat docker docker-compose
+sudo pacman -S --needed btop fd ripgrep bat docker docker-compose superfile
 sudo usermod -aG docker $USER
 ```
 
