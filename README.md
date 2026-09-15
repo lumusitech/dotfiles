@@ -47,8 +47,9 @@ sudo pacman -S --needed translate-shell
 yay -S --needed voxtype-bin
 ```
 
-#### 3. Ofimática y Tipografías MS
+#### 3. Ofimática, PDFs y Tipografías MS
 ```bash
+sudo pacman -S --needed pdfarranger
 yay -S --needed onlyoffice-bin ttf-ms-fonts ttf-vista-fonts ttf-aptos-fonts
 fc-cache -fv
 ```
@@ -85,7 +86,7 @@ sudo mount -a
 
 ### Paso 3: Instalar únicamente el Delta y habilitar Docker
 ```bash
-sudo pacman -S --needed rclone fuse3 ntfs-3g translate-shell kdeconnect breeze qqc2-breeze-style sshfs dnsmasq sunshine
+sudo pacman -S --needed rclone fuse3 ntfs-3g translate-shell kdeconnect breeze qqc2-breeze-style sshfs dnsmasq sunshine pdfarranger
 yay -S --needed voxtype-bin onlyoffice-bin ttf-ms-fonts ttf-vista-fonts ttf-aptos-fonts hypr-kdeconnect-fix-git
 fc-cache -fv
 
@@ -119,7 +120,7 @@ chezmoi init --apply https://github.com/lumusitech/dotfiles.git
 *Los hooks automáticos de Chezmoi se encargarán de:*
 * Sincronizar runtimes (`Node`, `Java`, `Python`, etc.) con `mise install`.
 * Descargar el modelo Whisper `small` de Voxtype de forma desatendida.
-* Aprovisionar y sincronizar la suite de plugins de Omarchy Shell (`quickshell-screentime`, `omaland`, `nexthop`, `omaconnect`, `omamail`), inyectar accesos de menú y refrescar la barra.
+* Aprovisionar y sincronizar la suite de plugins de Omarchy Shell (`quickshell-screentime`, `omaland`, `nexthop`, `omamail`), inyectar accesos de menú y refrescar la barra.
 * Habilitar y arrancar servicios de usuario (`rclone-mount@`, `onedrive-mount@`, `voxtype.service` y `notify-video-editor.service`).
 * Aplicar optimizaciones de visualización en Nautilus.
 * Desplegar todos los atajos de teclado, scripts de `~/.local/bin/`, webapps e iconos.
@@ -210,7 +211,6 @@ Para garantizar que aparezcan siempre en el buscador de aplicaciones (`Super + S
 | Plugin | ID / Repositorio | Tipo | Función |
 | :--- | :--- | :--- | :--- |
 | **Omaland** | `bobbynicholas.omaland` | `panel`, `service` | GUI en vivo para gaps, bordes, desenfoque y animaciones en Hyprland. |
-| **OmaConnect** | `omaconnect` | `service`, `bar-widget` | Integración nativa de KDE Connect en la barra con estética Quickshell. |
 | **Omamail** | `omamail` | `service`, `bar-widget`, `panel` | Notificador discreto de correo (Gmail, HEY, IMAP). |
 | **Nexthop** | `io.github.x3me.nexthop` | `bar-widget`, `service` | Monitor de red que desglosa latencia de Wi-Fi local vs. ISP. |
 | **Screen Time** | `agx.screen-time` | `service`, `bar-widget` | Rastreo pasivo del tiempo productivo por aplicación. |
