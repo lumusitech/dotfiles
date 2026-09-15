@@ -5,5 +5,5 @@ else
     if ! hyprctl monitors | grep -q "special:notes"; then
         hyprctl dispatch 'hl.dsp.workspace.toggle_special("notes")'
     fi
-    hyprctl dispatch "hl.dsp.exec_cmd(\"foot --title=QuickNotes -e nvim $HOME/notes.md\")"
+    hyprctl dispatch "hl.dsp.exec_cmd(\"kitty --title=QuickNotes nvim $HOME/notes.md\")"
 fi

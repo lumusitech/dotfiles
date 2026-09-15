@@ -217,6 +217,24 @@ Para garantizar que aparezcan siempre en el buscador de aplicaciones (`Super + S
 
 ---
 
+## 📝 Scratchpad de Notas Rápidas (`Super + N`) y Markdown Enriquecido
+
+Omarchy 4 integra una ventana flotante de notas rápidas (`notes.md`) gestionada como scratchpad en Hyprland (`special:notes`, flotante 1000x650):
+
+* **Terminal dedicada Kitty:** El script [`toggle-notes`](dot_local/bin/executable_toggle-notes) invoca Neovim dentro de **Kitty** (`kitty --title=QuickNotes nvim $HOME/notes.md`), alineándose con el emulador por defecto del sistema y permitiendo renderizado nativo de imágenes vía *Kitty Graphics Protocol*.
+* **Renderizado estético en Neovim ([`markdown.lua`](dot_config/nvim/lua/plugins/markdown.lua)):**
+  * **Títulos y encabezados:** Iconos Nerd Font por nivel (`󰲡 `, `󰲣 `, `󰲥 `, etc.), fondo destacado en todo el ancho y supresión visual limpia de `#`.
+  * **Bloques de código:** Cajas con bordes finos Unicode (`border = "thin"`), icono de lenguaje ( Lua,  Bash, 󰌷 Python, etc.) y nombre de lenguaje destacado.
+  * **Tablas Unicode:** Bordes redondeados elegantes (`preset = "round"`: `╭─┬─╮`, `│ │ │`, `├─┼─┤`, `╰─┴─╯`) y cabeceras estilizadas.
+  * **Casillas de verificación (To-Dos):** Íconos interactivos para tareas pendientes (`󰄱`), completadas (`󰄲`) y en progreso (`󰥔`).
+  * **Imágenes inline y portapapeles:**
+    * Imágenes renderizadas automáticamente en el buffer mediante [`snacks.nvim`](https://github.com/folke/snacks.nvim) (`snacks.image`).
+    * Pegado instantáneo de capturas de pantalla desde el portapapeles con `<leader>p` vía [`img-clip.nvim`](https://github.com/HakonHarnes/img-clip.nvim).
+  * **Edición interactiva:** Navegación por tablas y alternancia to-do con [`mkdnflow.nvim`](https://github.com/jakewvincent/mkdnflow.nvim).
+  * **Vista previa web sincrónica:** Atajo `<leader>cp` para abrir previsualización en el navegador en tiempo real ([`markdown-preview.nvim`](https://github.com/iamcco/markdown-preview.nvim)).
+
+---
+
 ## 🛡️ Guía Paso a Paso: Cómo Modificar y Guardar tus Dotfiles
 
 La rama principal **`main` está protegida en GitHub**. Nadie puede hacer push directo para evitar romper configuraciones en producción.
@@ -309,6 +327,9 @@ czmain
 | **`hotspot`** | Alternar encendido/apagado del Hotspot Wi-Fi 5 GHz (`PC-5G`). |
 | **`hotspot-on`** | Activar Hotspot Wi-Fi 5 GHz dedicado para streaming de pantalla. |
 | **`hotspot-off`** | Desactivar Hotspot 5 GHz y devolver dispositivos al Wi-Fi del hogar. |
+| **`Super + N`** | Alternar scratchpad de Notas Rápidas en Kitty con Markdown enriquecido. |
+| **`<leader>p`** | (En Neovim) Pegar imagen desde el portapapeles en archivos Markdown (`img-clip`). |
+| **`<leader>cp`** | (En Neovim) Abrir previsualización web sincrónica en el navegador (`markdown-preview`). |
 
 > [!TIP]
 > **¿No te reconoce algún comando o alias?**
