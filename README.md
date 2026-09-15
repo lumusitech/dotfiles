@@ -60,6 +60,12 @@ sudo pacman -S --needed kdeconnect breeze qqc2-breeze-style sshfs dnsmasq sunshi
 yay -S --needed hypr-kdeconnect-fix-git
 ```
 
+#### 5. Productividad en Terminal & Explorador de Archivos (TUI)
+```bash
+sudo pacman -S --needed superfile
+```
+* **Superfile (`spf`):** Explorador de archivos moderno para terminal con pestañas, paneles divididos, previsualización de sintaxis y soporte de imágenes.
+
 ---
 
 ## 🔄 Protocolo de Restauración desde Cero (Disaster Recovery)
@@ -86,7 +92,7 @@ sudo mount -a
 
 ### Paso 3: Instalar únicamente el Delta y habilitar Docker
 ```bash
-sudo pacman -S --needed rclone fuse3 ntfs-3g translate-shell kdeconnect breeze qqc2-breeze-style sshfs dnsmasq sunshine pdfarranger
+sudo pacman -S --needed rclone fuse3 ntfs-3g translate-shell kdeconnect breeze qqc2-breeze-style sshfs dnsmasq sunshine pdfarranger superfile
 yay -S --needed voxtype-bin onlyoffice-bin ttf-ms-fonts ttf-vista-fonts ttf-aptos-fonts hypr-kdeconnect-fix-git
 fc-cache -fv
 

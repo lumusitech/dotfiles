@@ -10,6 +10,7 @@ alias la='ls -A'
 alias l='ls -CF'
 alias cl='clear'
 alias hist='history'
+alias sf='spf'
 
 # ------------------------------------------------------------------------------
 # 2. GIT (Equivalentes Oh My Zsh sin colisiones con fns/worktrees)
