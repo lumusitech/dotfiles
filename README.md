@@ -334,6 +334,9 @@ czmain
 | **`hotspot-on`** | Activar Hotspot Wi-Fi 5 GHz dedicado para streaming de pantalla. |
 | **`hotspot-off`** | Desactivar Hotspot 5 GHz y devolver dispositivos al Wi-Fi del hogar. |
 | **`Super + N`** | Alternar scratchpad de Notas Rápidas en Kitty con Markdown enriquecido. |
+| **`Super + M`** | Alternar scratchpad de YouTube Music Web App. |
+| **`Super + W`** | Alternar scratchpad de WhatsApp Web. |
+| **`Super + Q`** | Cerrar la ventana activa (reemplaza el atajo original Super + W). |
 | **`<leader>p`** | (En Neovim) Pegar imagen desde el portapapeles en archivos Markdown (`img-clip`). |
 | **`<leader>cp`** | (En Neovim) Abrir previsualización web sincrónica en el navegador (`markdown-preview`). |
 
