@@ -10,8 +10,12 @@ o.bind("SUPER + N", "Toggle Notes", "bash ~/.local/bin/toggle-notes")
 hl.unbind("SUPER + SHIFT + M")
 o.bind("SUPER + M", "Toggle YT Music", "bash ~/.local/bin/toggle-ytmusic")
 
--- WhatsApp Web (SUPER + ALT + M)
-o.bind("SUPER + ALT + M", "Toggle WhatsApp", "bash ~/.local/bin/toggle-whatsapp")
+-- WhatsApp Web (SUPER + W)
+hl.unbind("SUPER + W")
+o.bind("SUPER + W", "Toggle WhatsApp", "bash ~/.local/bin/toggle-whatsapp")
+
+-- Cerrar ventana activa (SUPER + Q en lugar de SUPER + W)
+o.bind("SUPER + Q", "Close window", hl.dsp.window.close())
 
 -- Calculadora (SUPER + ALT + C)
 o.bind("SUPER + ALT + C", "Toggle Calculator", "bash ~/.local/bin/toggle-calc")
