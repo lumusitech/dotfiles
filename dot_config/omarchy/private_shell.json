@@ -64,6 +64,9 @@
           "id": "omarchy.bluetooth"
         },
         {
+          "id": "carludev.kdeconnect"
+        },
+        {
           "id": "omarchy.network"
         },
         {
