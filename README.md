@@ -54,9 +54,9 @@ yay -S --needed onlyoffice-bin ttf-ms-fonts ttf-vista-fonts ttf-aptos-fonts
 fc-cache -fv
 ```
 
-#### 4. Integración Móvil, Streaming y Red Hotspot 5G
+#### 4. Integración Móvil y Red Hotspot 5G
 ```bash
-sudo pacman -S --needed kdeconnect breeze qqc2-breeze-style sshfs dnsmasq sunshine
+sudo pacman -S --needed kdeconnect breeze qqc2-breeze-style sshfs dnsmasq
 yay -S --needed hypr-kdeconnect-fix-git
 ```
 
@@ -92,7 +92,7 @@ sudo mount -a
 
 ### Paso 3: Instalar únicamente el Delta y habilitar Docker
 ```bash
-sudo pacman -S --needed rclone fuse3 ntfs-3g translate-shell kdeconnect breeze qqc2-breeze-style sshfs dnsmasq sunshine pdfarranger superfile
+sudo pacman -S --needed rclone fuse3 ntfs-3g translate-shell kdeconnect breeze qqc2-breeze-style sshfs dnsmasq pdfarranger superfile
 yay -S --needed voxtype-bin onlyoffice-bin ttf-ms-fonts ttf-vista-fonts ttf-aptos-fonts hypr-kdeconnect-fix-git
 fc-cache -fv
 
@@ -100,12 +100,7 @@ fc-cache -fv
 sudo systemctl enable --now docker
 sudo usermod -aG docker $USER
 
-# Habilitar servicio de streaming Sunshine para el usuario
-systemctl --user enable --now app-dev.lizardbyte.app.Sunshine.service
-
-# Reglas de Firewall (UFW) para Sunshine, Hotspot y reenvío de Internet (wlo1 -> enp5s0)
-sudo ufw allow 47984:48010/tcp
-sudo ufw allow 47984:48010/udp
+# Reglas de Firewall (UFW) para Hotspot y reenvío de Internet (wlo1 -> enp5s0)
 sudo ufw allow in on wlo1
 sudo ufw route allow in on wlo1 out on enp5s0
 
@@ -149,14 +144,14 @@ Omarchy 4 integra virtualización KVM asistida por Docker (`dockurr/windows`) co
 
 ---
 
-## 📱 Integración Móvil, Streaming y Hotspot 5 GHz
+## 📱 Integración Móvil y Hotspot 5 GHz
 
-Omarchy 4 integra una suite de sincronización y duplicación de pantalla optimizada para tablets y smartphones (Samsung Galaxy Tab / Android):
+Omarchy 4 integra una suite de sincronización y conectividad optimizada para tablets y smartphones (Samsung Galaxy Tab / Android):
 
-* **KDE Connect sobre Hyprland:** Autostart del indicador con integración nativa de tema oscuro (`dot_config/kdeglobals`), soporte de mouse/teclado y S-Pen en Wayland vía `hypr-kdeconnect-fix-git` (`libei`), y navegación directa de archivos en Nautilus mediante handler personalizado.
-* **Sunshine + Moonlight:** Streaming de pantalla a 60 FPS con codificación por hardware AMD VAAPI, baja latencia y soporte para gestos táctiles.
+* **KDE Connect sobre Hyprland:** Servicio en segundo plano silencioso (`/usr/bin/kdeconnectd`) sin íconos en la bandeja, acceso rápido a la interfaz moderna Kirigami/Qt6 mediante scratchpad flotante centrado con el atajo **`Super + Shift + K`**, integración nativa de tema oscuro (`dot_config/kdeglobals`), soporte de mouse/teclado y S-Pen en Wayland vía `hypr-kdeconnect-fix-git` (`libei`), y navegación directa de archivos en Nautilus mediante handler personalizado.
 * **Hotspot Wi-Fi Dedicado 5 GHz (`PC-5G`):** Punto de acceso en canal 36 (5180 MHz) vía `wlo1` con DHCP (`dnsmasq`) y reenvío de tráfico internet a través de Ethernet Gigabit (`enp5s0`), eliminando por completo el jitter y los microcortes de audio causados por el *Band Steering* del router hogareño.
 * **Scripts de control rápido:** Utilitarios [`hotspot-on`](dot_local/bin/executable_hotspot-on), [`hotspot-off`](dot_local/bin/executable_hotspot-off) y [`hotspot`](dot_local/bin/executable_hotspot) en `~/.local/bin/`.
+* **Streaming Sunshine:** Desactivado y removido debido a rendimiento deficiente.
 
 📖 Documentación técnica completa, diagnóstico de hardware y runbook: [`docs/mobile-and-remote-streaming.md`](docs/mobile-and-remote-streaming.md).
 

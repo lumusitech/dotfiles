@@ -45,9 +45,7 @@
         },
         {
           "id": "omarchy.tray",
-          "pinned": [
-            "KDE Connect Indicator"
-          ],
+          "pinned": [],
           "hidden": []
         },
         {

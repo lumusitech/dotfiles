@@ -7,4 +7,4 @@
 -- Omarchy Autostart Services
 -- ==========================================
 
-o.launch_on_start("kdeconnect-indicator")
+o.launch_on_start("/usr/bin/kdeconnectd")

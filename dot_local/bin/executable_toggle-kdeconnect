@@ -1,0 +1,9 @@
+#!/usr/bin/env bash
+if hyprctl clients | grep -B 15 -iE "class:.*org\.kde\.kdeconnect\.app" | grep -q "workspace:.*special:kdeconnect"; then
+    hyprctl dispatch 'hl.dsp.workspace.toggle_special("kdeconnect")'
+else
+    if ! hyprctl monitors | grep -q "special:kdeconnect"; then
+        hyprctl dispatch 'hl.dsp.workspace.toggle_special("kdeconnect")'
+    fi
+    hyprctl dispatch 'hl.dsp.exec_cmd("kdeconnect-app")'
+fi

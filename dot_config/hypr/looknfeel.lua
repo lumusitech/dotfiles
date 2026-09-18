@@ -90,6 +90,14 @@ o.window({ class = ".*omacalc.*" }, {
   center = true,
 })
 
+-- KDE Connect UI moderna (Scratchpad)
+o.window({ class = "^org\\.kde\\.kdeconnect\\.app$" }, {
+  workspace = "special:kdeconnect",
+  float = true,
+  size = { 900, 650 },
+  center = true,
+})
+
 
 
 -- >>> omaland managed block >>>
