@@ -38,3 +38,6 @@ if o.cmd_present("voxtype") then
   o.bind("F10", "Start translation (EN)", "voxtype record start --profile translate")
   o.bind("F10", "Stop translation (EN)", "voxtype record stop", { release = true })
 end
+
+-- KDE Connect UI moderna (SUPER + SHIFT + K)
+o.bind("SUPER + SHIFT + K", "Toggle KDE Connect", "bash ~/.local/bin/toggle-kdeconnect")

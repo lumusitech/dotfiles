@@ -59,11 +59,16 @@ sudo pacman -S --needed kdeconnect breeze qqc2-breeze-style sshfs
 yay -S --needed hypr-kdeconnect-fix-git
 ```
 
-### ⚙️ Inicio Automático
-Se registra en [`dot_config/hypr/autostart.lua`](../dot_config/hypr/autostart.lua):
+### ⚙️ Inicio Automático y Acceso a la Interfaz Moderna
+* **Servicio en segundo plano (Daemon silencioso):** Se ejecuta en [`dot_config/hypr/autostart.lua`](../dot_config/hypr/autostart.lua) para mantener la sincronización continua sin ocupar espacio con un ícono clásico en la bandeja del sistema:
 ```lua
-o.launch_on_start("kdeconnect-indicator")
+o.launch_on_start("/usr/bin/kdeconnectd")
 ```
+
+* **Interfaz Moderna (Scratchpad Dedicado):** En lugar del applet tradicional de texto plano, se accede a la interfaz moderna basada en Kirigami/Qt6 (`kdeconnect-app`) mediante el atajo:
+  $$\mathbf{Super + Shift + K}$$
+  * Controlado mediante el script [`dot_local/bin/executable_toggle-kdeconnect`](../dot_local/bin/executable_toggle-kdeconnect).
+  * Regla de ventana flotante centrada (900×650) configurada en [`dot_config/hypr/looknfeel.lua`](../dot_config/hypr/looknfeel.lua).
 
 ### 🎨 Solución al Tema Claro Cegador (Kirigami / Qt6 Theming)
 Al ejecutarse en un entorno Wayland puro sin KDE Plasma, las aplicaciones basadas en Kirigami/Qt (como `kdeconnect-app` y `kdeconnect-settings`) renderizaban fondos blancos con texto ilegible.
@@ -83,14 +88,18 @@ Al ejecutarse en un entorno Wayland puro sin KDE Plasma, las aplicaciones basada
 
 ---
 
-## 📺 3. Streaming de Pantalla con Sunshine & Moonlight
+## 📺 3. Streaming de Pantalla con Sunshine & Moonlight (Deprecado)
 
-Permite duplicar o extender la pantalla del PC hacia la tablet a 60 FPS con aceleración por hardware.
+> [!NOTE]
+> **Estado:** Desactivado / Removido. Sunshine no ofreció el rendimiento ni estabilidad esperados en este flujo de trabajo. Se conservan las referencias técnicas únicamente para fines históricos o de auditoría.
 
-### 📦 Servicio y Aceleración
-Sunshine se instala desde los repositorios de Omarchy / Arch y se administra mediante systemd de usuario:
+### 📦 Desinstalación y Limpieza
+Para remover el servicio y paquetes de Sunshine:
 ```bash
-systemctl --user enable --now app-dev.lizardbyte.app.Sunshine.service
+systemctl --user disable --now app-dev.lizardbyte.app.Sunshine.service
+sudo pacman -Rns sunshine
+sudo ufw delete allow 47984:48010/tcp
+rm -rf ~/.config/sunshine
 ```
 * Utiliza codificación por hardware AMD VAAPI sobre GPU Radeon (`/dev/dri/renderD128`).
 * Puertos abiertos en el firewall UFW:
