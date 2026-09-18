@@ -11,6 +11,7 @@ declare -A PLUGINS=(
   ["agx.screen-time"]="https://github.com/ax1g/quickshell-screentime-plugin.git"
   ["bobbynicholas.omaland"]="https://github.com/bobby-nicholas/omaland.git"
   ["io.github.x3me.nexthop"]="https://github.com/x3me/omarchy-nexthop.git"
+  ["omaconnect"]="https://github.com/jitendradara12/omaconnect.git"
   ["omamail"]="https://github.com/huacnlee/omamail.git"
 )
 
@@ -29,6 +30,12 @@ if [ -f "$OMALAND_SERVICE" ]; then
   if ! grep -q "plugins/bobbynicholas.omaland" "$OMALAND_SERVICE"; then
     sed -i 's|var dir = manifest && manifest.__sourceDir|var dir = (manifest \&\& manifest.__sourceDir) \|\| (Quickshell.env("HOME") + "/.config/omarchy/plugins/bobbynicholas.omaland")|' "$OMALAND_SERVICE" || true
   fi
+fi
+
+# Parche de resiliencia para OmaConnect en DeviceSection.qml (evitar TypeError en incomingRequest nulo)
+OMACONNECT_DEVICE_SECTION="$PLUGINS_DIR/omaconnect/components/DeviceSection.qml"
+if [ -f "$OMACONNECT_DEVICE_SECTION" ]; then
+  sed -i 's|text: "Verify on both devices: " + (root\.service ? root\.service\.formatVerificationKey(panel\.incomingRequest\.verificationKey) : panel\.incomingRequest\.verificationKey)|text: (panel.incomingRequest \&\& panel.incomingRequest.verificationKey) ? "Verify on both devices: " + (root.service ? root.service.formatVerificationKey(panel.incomingRequest.verificationKey) : panel.incomingRequest.verificationKey) : ""|' "$OMACONNECT_DEVICE_SECTION" 2>/dev/null || true
 fi
 
 # Actualizar base de datos de aplicaciones de escritorio y refrescar Omarchy Shell
