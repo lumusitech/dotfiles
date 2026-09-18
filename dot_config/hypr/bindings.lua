@@ -39,5 +39,6 @@ if o.cmd_present("voxtype") then
   o.bind("F10", "Stop translation (EN)", "voxtype record stop", { release = true })
 end
 
--- KDE Connect UI moderna (SUPER + SHIFT + K)
-o.bind("SUPER + SHIFT + K", "Toggle KDE Connect", "bash ~/.local/bin/toggle-kdeconnect")
+-- KDE Connect: desplegable rápido en barra (SUPER + SHIFT + C) y app completa (SUPER + SHIFT + K)
+o.bind("SUPER + SHIFT + C", "Toggle OmaConnect", "omarchy-shell shell toggle omaconnect")
+o.bind("SUPER + SHIFT + K", "Toggle KDE Connect App", "bash ~/.local/bin/toggle-kdeconnect")

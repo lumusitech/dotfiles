@@ -121,7 +121,7 @@ chezmoi init --apply https://github.com/lumusitech/dotfiles.git
 *Los hooks automáticos de Chezmoi se encargarán de:*
 * Sincronizar runtimes (`Node`, `Java`, `Python`, etc.) con `mise install`.
 * Descargar el modelo Whisper `small` de Voxtype de forma desatendida.
-* Aprovisionar y sincronizar la suite de plugins de Omarchy Shell (`quickshell-screentime`, `omaland`, `nexthop`, `omamail`), inyectar accesos de menú y refrescar la barra.
+* Aprovisionar y sincronizar la suite de plugins de Omarchy Shell (`quickshell-screentime`, `omaland`, `nexthop`, `omaconnect`, `omamail`), inyectar accesos de menú y refrescar la barra.
 * Habilitar y arrancar servicios de usuario (`rclone-mount@`, `onedrive-mount@`, `voxtype.service` y `notify-video-editor.service`).
 * Aplicar optimizaciones de visualización en Nautilus.
 * Desplegar todos los atajos de teclado, scripts de `~/.local/bin/`, webapps e iconos.
@@ -148,7 +148,7 @@ Omarchy 4 integra virtualización KVM asistida por Docker (`dockurr/windows`) co
 
 Omarchy 4 integra una suite de sincronización y conectividad optimizada para tablets y smartphones (Samsung Galaxy Tab / Android):
 
-* **KDE Connect sobre Hyprland:** Servicio en segundo plano silencioso (`/usr/bin/kdeconnectd`) sin íconos en la bandeja, acceso rápido a la interfaz moderna Kirigami/Qt6 mediante scratchpad flotante centrado con el atajo **`Super + Shift + K`**, integración nativa de tema oscuro (`dot_config/kdeglobals`), soporte de mouse/teclado y S-Pen en Wayland vía `hypr-kdeconnect-fix-git` (`libei`), y navegación directa de archivos en Nautilus mediante handler personalizado.
+* **KDE Connect sobre Hyprland:** Servicio en segundo plano silencioso (`/usr/bin/kdeconnectd`) sin íconos obsoletos en la bandeja, widget interactivo en la barra superior (**OmaConnect**) con desplegable flotante de estado en tiempo real (batería, red celular, señal, acciones rápidas y multimedia con atajo **`Super + Shift + C`** o clic), y acceso complementario a la interfaz completa Kirigami/Qt6 mediante scratchpad flotante centrado con **`Super + Shift + K`**. Integración nativa de tema oscuro (`dot_config/kdeglobals`), soporte de mouse/teclado y S-Pen en Wayland vía `hypr-kdeconnect-fix-git` (`libei`), y navegación directa de archivos en Nautilus.
 * **Hotspot Wi-Fi Dedicado 5 GHz (`PC-5G`):** Punto de acceso en canal 36 (5180 MHz) vía `wlo1` con DHCP (`dnsmasq`) y reenvío de tráfico internet a través de Ethernet Gigabit (`enp5s0`), eliminando por completo el jitter y los microcortes de audio causados por el *Band Steering* del router hogareño.
 * **Scripts de control rápido:** Utilitarios [`hotspot-on`](dot_local/bin/executable_hotspot-on), [`hotspot-off`](dot_local/bin/executable_hotspot-off) y [`hotspot`](dot_local/bin/executable_hotspot) en `~/.local/bin/`.
 * **Streaming Sunshine:** Desactivado y removido debido a rendimiento deficiente.
@@ -212,6 +212,7 @@ Para garantizar que aparezcan siempre en el buscador de aplicaciones (`Super + S
 | Plugin | ID / Repositorio | Tipo | Función |
 | :--- | :--- | :--- | :--- |
 | **Omaland** | `bobbynicholas.omaland` | `panel`, `service` | GUI en vivo para gaps, bordes, desenfoque y animaciones en Hyprland. |
+| **OmaConnect** | `omaconnect` | `service`, `bar-widget` | Integración nativa de KDE Connect en la barra con desplegable de estado (batería, señal, ping, compartir y controles multimedia). |
 | **Omamail** | `omamail` | `service`, `bar-widget`, `panel` | Notificador discreto de correo (Gmail, HEY, IMAP). |
 | **Nexthop** | `io.github.x3me.nexthop` | `bar-widget`, `service` | Monitor de red que desglosa latencia de Wi-Fi local vs. ISP. |
 | **Screen Time** | `agx.screen-time` | `service`, `bar-widget` | Rastreo pasivo del tiempo productivo por aplicación. |

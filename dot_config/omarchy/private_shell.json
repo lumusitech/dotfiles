@@ -46,7 +46,9 @@
         {
           "id": "omarchy.tray",
           "pinned": [],
-          "hidden": []
+          "hidden": [
+            "KDE Connect Indicator"
+          ]
         },
         {
           "id": "agx.screen-time"
@@ -64,7 +66,7 @@
           "id": "omarchy.bluetooth"
         },
         {
-          "id": "carludev.kdeconnect"
+          "id": "omaconnect"
         },
         {
           "id": "omarchy.network"
