@@ -63,3 +63,12 @@ export PATH="$PATH:/home/carludev/.lmstudio/bin"
 if command -v ng >/dev/null 2>&1; then
     source <(ng completion script)
 fi
+
+# Cambia fzf para que busque archivos con Ctrl + f (de Find)
+bind -m emacs-standard -x '"\C-f": fzf-file-widget'
+bind -m vi-command -x '"\C-f": fzf-file-widget'
+bind -m vi-insert -x '"\C-f": fzf-file-widget'
+
+# Devuelve Ctrl + t a su función original de rotar letras
+bind -m emacs-standard '"\C-t": transpose-chars'
+bind -m vi-insert '"\C-t": transpose-chars'
