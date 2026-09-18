@@ -92,7 +92,16 @@
   "plugins": [
     {
       "id": "bobbynicholas.omaland"
+    },
+    {
+      "id": "carludev.notifications"
     }
   ],
-  "version": 1
+  "version": 1,
+  "disabledPlugins": [
+    "omarchy.notifications"
+  ],
+  "cloneSourceRestores": [
+    "carludev.notifications"
+  ]
 }

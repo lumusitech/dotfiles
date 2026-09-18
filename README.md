@@ -217,6 +217,10 @@ Para garantizar que aparezcan siempre en el buscador de aplicaciones (`Super + S
 | **Nexthop** | `io.github.x3me.nexthop` | `bar-widget`, `service` | Monitor de red que desglosa latencia de Wi-Fi local vs. ISP. |
 | **Screen Time** | `agx.screen-time` | `service`, `bar-widget` | Rastreo pasivo del tiempo productivo por aplicación. |
 
+### 6. Interacción Inteligente con Notificaciones
+* **Clic Izquierdo:** Abre o enfoca automáticamente la aplicación correspondiente (aplicación nativa o web app como WhatsApp Web, YouTube Music, Discord, Chrome, etc.) donde se originó la notificación a través del asistente [`omarchy-notification-open-app`](dot_local/bin/executable_omarchy-notification-open-app). Si la ventana está en un scratchpad de Hyprland (`special:whatsapp`, `special:music`, etc.), lo despliega y enfoca; si no está abierta, lanza su `.desktop` o script de inmediato.
+* **Clic Derecho:** Cierra y descarta la notificación sin realizar ninguna acción secundaria.
+
 ---
 
 ## 📝 Scratchpad de Notas Rápidas (`Super + N`) y Markdown Enriquecido

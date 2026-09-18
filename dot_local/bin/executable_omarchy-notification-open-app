@@ -1,0 +1,180 @@
+#!/usr/bin/env bash
+# ==============================================================================
+# omarchy-notification-open-app
+# Opens or focuses the corresponding application (native or web app) when
+# clicking a desktop notification in Omarchy Shell.
+# ==============================================================================
+
+set -euo pipefail
+
+app_name="${1:-}"
+desktop_entry="${2:-}"
+app_icon="${3:-}"
+summary="${4:-}"
+body="${5:-}"
+
+# Normalize inputs for pattern matching
+search_terms=()
+[[ -n "$desktop_entry" ]] && search_terms+=("$desktop_entry")
+[[ -n "$app_name" ]] && search_terms+=("$app_name")
+[[ -n "$app_icon" ]] && search_terms+=("$app_icon")
+
+if (( ${#search_terms[@]} == 0 )); then
+  exit 0
+fi
+
+combined_text=$(printf '%s ' "$app_name" "$desktop_entry" "$app_icon" "$summary" | tr '[:upper:]' '[:lower:]')
+
+# ------------------------------------------------------------------------------
+# 1. Check known webapps & special scratchpads first
+# ------------------------------------------------------------------------------
+if [[ "$combined_text" =~ (whatsapp|web\.whatsapp\.com) ]]; then
+  if [[ -x "$HOME/.local/bin/toggle-whatsapp" ]]; then
+    exec bash "$HOME/.local/bin/toggle-whatsapp"
+  fi
+fi
+
+if [[ "$combined_text" =~ (youtube.*music|music\.youtube\.com|ytmusic) ]]; then
+  if [[ -x "$HOME/.local/bin/toggle-ytmusic" ]]; then
+    exec bash "$HOME/.local/bin/toggle-ytmusic"
+  fi
+fi
+
+if [[ "$combined_text" =~ (kde.*connect) ]]; then
+  if [[ -x "$HOME/.local/bin/toggle-kdeconnect" ]]; then
+    exec bash "$HOME/.local/bin/toggle-kdeconnect"
+  fi
+fi
+
+if [[ "$combined_text" =~ (quicknotes|notes\.md) ]]; then
+  if [[ -x "$HOME/.local/bin/toggle-notes" ]]; then
+    exec bash "$HOME/.local/bin/toggle-notes"
+  fi
+fi
+
+if [[ "$combined_text" =~ (calculator|calc) ]]; then
+  if [[ -x "$HOME/.local/bin/toggle-calc" ]]; then
+    exec bash "$HOME/.local/bin/toggle-calc"
+  fi
+fi
+
+# ------------------------------------------------------------------------------
+# 2. Check if a matching window is already open in Hyprland
+# ------------------------------------------------------------------------------
+clients_json=$(hyprctl clients -j 2>/dev/null || echo "[]")
+
+for term in "${search_terms[@]}"; do
+  [[ -n "$term" ]] || continue
+  
+  # Match by class, initialClass, or title
+  match_info=$(echo "$clients_json" | jq -r --arg pattern "$term" '
+    def matches($val): ($val // "") | test($pattern; "i");
+    first(
+      .[] | select(
+        matches(.class) or 
+        matches(.initialClass) or 
+        (matches(.title) and (.class != "kitty" and .class != "foot")) or
+        (.initialClass == "org.omarchy.agent" and matches(.initialTitle))
+      )
+    ) | { address: .address, workspace: .workspace.name } // empty
+  ' 2>/dev/null || true)
+
+  if [[ -n "$match_info" ]]; then
+    target_address=$(echo "$match_info" | jq -r '.address // empty')
+    target_workspace=$(echo "$match_info" | jq -r '.workspace // empty')
+
+    if [[ -n "$target_address" ]]; then
+      # If window is inside a special workspace (scratchpad), ensure it is visible
+      if [[ "$target_workspace" =~ ^special:(.+) ]]; then
+        special_name="${BASH_REMATCH[1]}"
+        is_open=$(hyprctl monitors -j 2>/dev/null | jq -r --arg s "$target_workspace" '.[] | select(.specialWorkspace.name == $s) | .name' | head -n1)
+        if [[ -z "$is_open" ]]; then
+          hyprctl dispatch togglespecialworkspace "$special_name" >/dev/null 2>&1 || true
+        fi
+      fi
+
+      # Focus the window
+      hyprctl dispatch "hl.dsp.focus({ window = \"address:$target_address\" })" >/dev/null 2>&1 || \
+        hyprctl dispatch focuswindow "address:$target_address" >/dev/null 2>&1 || true
+      exit 0
+    fi
+  fi
+done
+
+# ------------------------------------------------------------------------------
+# 3. If window is not open, launch the application
+# ------------------------------------------------------------------------------
+
+# 3a. Try gtk-launch with desktop_entry if valid
+if [[ -n "$desktop_entry" ]]; then
+  entry_name="${desktop_entry%.desktop}"
+  if gtk-launch "$entry_name" >/dev/null 2>&1; then
+    exit 0
+  fi
+fi
+
+# 3b. Search for matching .desktop file in standard XDG directories
+desktop_dirs=(
+  "$HOME/.local/share/applications"
+  "/usr/local/share/applications"
+  "/usr/share/applications"
+  "/var/lib/flatpak/exports/share/applications"
+)
+
+find_and_launch_desktop() {
+  local query="$1"
+  local q_lower
+  q_lower=$(echo "$query" | tr '[:upper:]' '[:lower:]')
+
+  for dir in "${desktop_dirs[@]}"; do
+    [[ -d "$dir" ]] || continue
+    
+    # 1. Exact file match
+    if [[ -f "$dir/$query.desktop" ]]; then
+      gtk-launch "$query" >/dev/null 2>&1 && return 0
+    fi
+
+    # 2. Case-insensitive filename match
+    local found_file=""
+    found_file=$(find "$dir" -maxdepth 1 -iname "*$query*.desktop" -type f | head -n1)
+    if [[ -n "$found_file" ]]; then
+      local base_id
+      base_id=$(basename "$found_file" .desktop)
+      gtk-launch "$base_id" >/dev/null 2>&1 && return 0
+    fi
+
+    # 3. Match Name= inside .desktop
+    local name_match=""
+    name_match=$(grep -Eil "^Name=.*$query" "$dir"/*.desktop 2>/dev/null | head -n1 || true)
+    if [[ -n "$name_match" ]]; then
+      local base_id
+      base_id=$(basename "$name_match" .desktop)
+      gtk-launch "$base_id" >/dev/null 2>&1 && return 0
+    fi
+  done
+  return 1
+}
+
+for term in "${search_terms[@]}"; do
+  [[ -n "$term" ]] || continue
+  if find_and_launch_desktop "$term"; then
+    exit 0
+  fi
+done
+
+# 3c. Check if app_name or app_icon is an executable in PATH
+for exe in "$app_name" "$app_icon"; do
+  [[ -n "$exe" ]] || continue
+  if command -v "$exe" >/dev/null 2>&1; then
+    setsid "$exe" >/dev/null 2>&1 &
+    exit 0
+  fi
+done
+
+# 3d. Fallback for Google Chrome / Web notifications
+if [[ "$combined_text" =~ (chrome|chromium|google) ]]; then
+  setsid google-chrome >/dev/null 2>&1 &
+  exit 0
+fi
+
+exit 0
